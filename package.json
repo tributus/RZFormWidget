@@ -1,0 +1,14 @@
+{
+  "name": "RZFormWidget",
+  "version": "0.0.1",
+  "description": "Widget Formularios",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "widgets"
+  ],
+  "author": "Anderson Norberto Santos",
+  "license": "MIT"
+}

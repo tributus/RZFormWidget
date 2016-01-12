@@ -1,0 +1,22 @@
+{
+  "name": "RZFormWidget",
+  "version": "0.0.1",
+  "authors": [
+    "Anderson Norberto Santos <andersonhtm@hotmail.com>"
+  ],
+  "description": "Widget de criação de formulários web",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "form"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

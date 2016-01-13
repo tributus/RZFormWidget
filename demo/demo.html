@@ -4,10 +4,361 @@
     <meta charset="UTF-8">
     <title></title>
     <script src="../lib/jquery-2.1.4.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script src="../lib/RZClientEngine-0.0.1.min.js"></script>
     <script src="../dist/RZFormWidget.js"></script>
 </head>
 <body>
+<h1>Exemplo 1</h1>
+
+<p>default renderer</p>
+
+<div id="smform"></div>
+<button id="btn11" class="btn btn-default">getFormData()</button>
+<button id="btn12" class="btn btn-default">fieldCount()</button>
+<button id="btn13" class="btn btn-default">getFieldIdAt(1)</button>
+<button id="btn14" class="btn btn-default">addField({...})</button>
+<button id="btn15" class="btn btn-default">insertField({...},1)</button>
+<button id="btn16" class="btn btn-default">removeFieldAt(0)</button>
+<button id="btn17" class="btn btn-default">removeFieldById('r0')</button>
+<button id="btn18" class="btn btn-default">getValueAt(0)</button>
+<button id="btn19" class="btn btn-default">getValueOf('r0')</button>
+<button id="btn110" class="btn btn-default">setValueAt(0,'ffff')</button>
+<button id="btn111" class="btn btn-default">setValueOf('r0','valor')</button>
+<button id="btn112" class="btn btn-default">clearFormData()</button>
+<button id="btn113" class="btn btn-default">Bind Change Event</button>
+<div id="viewdata"></div>
+<textarea id="eventhnd"></textarea>
+
+<br><br>
+
+<h1>Exemplo 2</h1>
+
+<p>v-grid renderer</p>
+
+<div id="smform2"></div>
+<button id="btn21" class="btn btn-default">getFormData()</button>
+<button id="btn22" class="btn btn-default">fieldCount()</button>
+<button id="btn23" class="btn btn-default">getFieldIdAt(1)</button>
+<button id="btn24" class="btn btn-default">addField({...})</button>
+<button id="btn25" class="btn btn-default">insertField({...},1)</button>
+<button id="btn26" class="btn btn-default">removeFieldAt(0)</button>
+<button id="btn27" class="btn btn-default">removeFieldById('r0')</button>
+<button id="btn28" class="btn btn-default">getValueAt(0)</button>
+<button id="btn29" class="btn btn-default">getValueOf('r0')</button>
+<button id="btn210" class="btn btn-default">setValueAt(0,'ffff')</button>
+<button id="btn211" class="btn btn-default">setValueOf('r0','valor')</button>
+<button id="btn212" class="btn btn-default">clearFormData()</button>
+<button id="btn213" class="btn btn-default">Bind Change Event</button>
+<div id="viewdata2"></div>
+<textarea id="eventhnd2"></textarea>
+
+
+<br><br>
+
+<h1>Exemplo 3</h1>
+
+<p>grid-row renderer</p>
+
+<div>
+    <table>
+        <thead>
+        <tr>
+            <th>C1</th>
+            <th>C2</th>
+            <th>C3</th>
+        </tr>
+        </thead>
+        <tbody id="smform3"></tbody>
+    </table>
+</div>
+<button id="btn31" class="btn btn-default">getFormData()</button>
+<button id="btn32" class="btn btn-default">fieldCount()</button>
+<button id="btn33" class="btn btn-default">getFieldIdAt(1)</button>
+<button id="btn34" class="btn btn-default">addField({...})</button>
+<button id="btn35" class="btn btn-default">insertField({...},1)</button>
+<button id="btn36" class="btn btn-default">removeFieldAt(0)</button>
+<button id="btn37" class="btn btn-default">removeFieldById('r0')</button>
+<button id="btn38" class="btn btn-default">getValueAt(0)</button>
+<button id="btn39" class="btn btn-default">getValueOf('r0')</button>
+<button id="btn310" class="btn btn-default">setValueAt(0,'ffff')</button>
+<button id="btn311" class="btn btn-default">setValueOf('r0','valor')</button>
+<button id="btn312" class="btn btn-default">clearFormData()</button>
+<button id="btn313" class="btn btn-default">Bind Change Event</button>
+<div id="viewdata3"></div>
+<textarea id="eventhnd3"></textarea>
+
 
 </body>
+<script>
+    /*****************************************exemplo 1**********************************************/
+
+    var formFields = [
+        {
+            fieldGroup: true,
+            groupLabel: "Geral",
+            fields: [
+                {model: "PrimeiroNome", label: "Primeiro nome", type: "text", id: "r0", initialValue: ""},
+                {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""}
+            ]
+        },
+        {
+            fieldGroup: true,
+            groupLabel: "Outras informações",
+            fields: [{
+                model: "form.f3", label: "Field 2", value: "1", type: "list", listItems: [
+                    {label: "lItem 1", value: 0},
+                    {label: "lItem 2", value: 1},
+                    {label: "lItem 3", value: 2}
+                ], initialValue: null
+            },
+                {model: "Obs", label: "Obs", type: "text", id: "r2", initialValue: ""},
+                {
+                    fieldGroup:true,
+                    groupdType:"collapse",
+                    collapsed:true,
+                    //collapsible:false,
+                    groupLabel:"Endereço",
+                    fields:[
+                        {model:"endereco.rua", label:"Rua"},
+                        {model:"endereco.bairro", label:"Bairro"},
+                        {model:"endereco.cidade", label:"Cidade"},
+                        {model:"endereco.cep", label:"CEP"}
+                    ]
+                }
+            ]
+        }
+    ];
+
+    var formFields2 =  [
+        {model: "Cliente.Nome", label: "Nome", type: "text", id: "r0", initialValue: ""},
+        {label: "Field 2", value: "3", type: "text"},
+        {
+            model: "form.f3", label: "Field 2", value: "1", type: "list", listItems: [
+            {label: "lItem 1", value: 0},
+            {label: "lItem 2", value: 1},
+            {label: "lItem 3", value: 2}
+        ], initialValue: null
+        }
+    ];
+
+    var formFields3 =[
+        {model: "PrimeiroNome", label: "Primeiro nome", type: "text", id: "r0", initialValue: ""},
+        {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""},
+        {
+            fieldGroup: true,
+            groupdLabel: "Outras informações",
+            fields: [
+                {
+                    model: "form.f3", label: "Field 2", value: "1", type: "list", listItems: [
+                    {label: "lItem 1", value: 0},
+                    {label: "lItem 2", value: 1},
+                    {label: "lItem 3", value: 2}
+                ], initialValue: null
+                },
+                {model: "Obs", label: "Obs", type: "text", id: "r2", initialValue: ""}
+            ]
+        }
+    ];
+
+    var formData = {
+        horizontal: true,
+        fields: formFields
+    };
+    var widgetInstance = ruteZangada.renderWidget("Form", "smform", formData);
+
+    $("#btn11").click(function () {
+        var json = JSON.stringify(widgetInstance.getFormData());
+        $("#viewdata").text(json);
+    });
+
+    $("#btn12").click(function () {
+        alert(widgetInstance.fieldCount());
+    });
+
+    $("#btn13").click(function () {
+        alert(widgetInstance.getFieldIdAt(1));
+    });
+
+    $("#btn14").click(function () {
+        var rowData = {label: "New Field", value: "new row value", type: "text"};
+        widgetInstance.addField(rowData);
+    });
+
+    $("#btn15").click(function () {
+        var rowData = {label: "New Inserted Field", type: "text"};
+        widgetInstance.insertField(rowData, 5);
+    });
+
+    $("#btn16").click(function () {
+        widgetInstance.removeFieldAt(5);
+    });
+
+    $("#btn17").click(function () {
+        widgetInstance.removeFieldById('r0');
+    });
+
+    $("#btn18").click(function () {
+        alert(widgetInstance.getValueAt(5));
+    });
+
+    $("#btn19").click(function () {
+        alert(widgetInstance.getValueOf('r0'));
+    });
+
+    $("#btn110").click(function () {
+        widgetInstance.setValueAt(5, 'ffff');
+    });
+
+    $("#btn111").click(function () {
+        widgetInstance.setValueOf('r0', 'valor');
+    });
+
+    $("#btn112").click(function () {
+        widgetInstance.clearFormData();
+    });
+
+    $("#btn113").click(function () {
+        widgetInstance.on("data-changed", function (sender, e) {
+            $('#eventhnd').val($('#eventhnd').val() + 'data-changed to ' + e.value + '\n');
+            console.log("sender: ", sender);
+            console.log("e", e);
+        });
+    });
+
+
+    /*****************************************exemplo 2**********************************************/
+    var formData2 = {
+        renderer: "v-grid",
+        fields: formFields
+    };
+    var widgetInstance2 = ruteZangada.renderWidget("Form", "smform2", formData2);
+
+    $("#btn21").click(function () {
+        var json = JSON.stringify(widgetInstance2.getFormData());
+        $("#viewdata2").text(json);
+    });
+
+    $("#btn22").click(function () {
+        alert(widgetInstance2.fieldCount());
+    });
+
+    $("#btn23").click(function () {
+        alert(widgetInstance2.getFieldIdAt(1));
+    });
+
+    $("#btn24").click(function () {
+        var rowData = {label: "New Field", value: "new row value", type: "text", model: "newField", id: "nf1"};
+        widgetInstance2.addField(rowData);
+    });
+
+    $("#btn25").click(function () {
+        var rowData = {label: "New Inserted Field", type: "text"};
+        widgetInstance2.insertField(rowData, 1);
+    });
+
+    $("#btn26").click(function () {
+        widgetInstance2.removeFieldAt(0);
+    });
+
+    $("#btn27").click(function () {
+        widgetInstance2.removeFieldById('r0');
+    });
+
+    $("#btn28").click(function () {
+        alert(widgetInstance2.getValueAt(0));
+    });
+
+    $("#btn29").click(function () {
+        alert(widgetInstance2.getValueOf('r0'));
+    });
+
+    $("#btn210").click(function () {
+        widgetInstance2.setValueAt(0, 'ffff');
+    });
+
+    $("#btn211").click(function () {
+        widgetInstance2.setValueOf('r0', 'valor');
+    });
+
+    $("#btn212").click(function () {
+        widgetInstance2.clearFormData();
+    });
+
+    $("#btn213").click(function () {
+        widgetInstance2.on("data-changed", function (sender, e) {
+            $('#eventhnd2').val($('#eventhnd2').val() + 'data-changed to ' + e.value + '\n');
+            console.log("sender: ", sender);
+            console.log("e", e);
+        });
+    });
+
+
+    /*****************************************exemplo 3**********************************************/
+    var formData3 = {
+        renderer: "grid-row",
+        fields: formFields
+    };
+    var widgetInstance3 = ruteZangada.renderWidget("Form", "smform3", formData3);
+
+    $("#btn31").click(function () {
+        var json = JSON.stringify(widgetInstance3.getFormData());
+        $("#viewdata3").text(json);
+    });
+
+    $("#btn32").click(function () {
+        alert(widgetInstance3.fieldCount());
+    });
+
+    $("#btn33").click(function () {
+        alert(widgetInstance3.getFieldIdAt(1));
+    });
+
+    $("#btn34").click(function () {
+        var rowData = {label: "New Field", value: "new row value", type: "text", model: "newField", id: "nf1"};
+        widgetInstance3.addField(rowData);
+    });
+
+    $("#btn35").click(function () {
+        var rowData = {label: "New Inserted Field", type: "text"};
+        widgetInstance3.insertField(rowData, 1);
+    });
+
+    $("#btn36").click(function () {
+        widgetInstance3.removeFieldAt(0);
+    });
+
+    $("#btn37").click(function () {
+        widgetInstance3.removeFieldById('r0');
+    });
+
+    $("#btn38").click(function () {
+        alert(widgetInstance3.getValueAt(0));
+    });
+
+    $("#btn39").click(function () {
+        alert(widgetInstance3.getValueOf('r0'));
+    });
+
+    $("#btn310").click(function () {
+        widgetInstance3.setValueAt(0, 'ffff');
+    });
+
+    $("#btn311").click(function () {
+        widgetInstance3.setValueOf('r0', 'valor');
+    });
+
+    $("#btn312").click(function () {
+        widgetInstance3.clearFormData();
+    });
+
+    $("#btn313").click(function () {
+        widgetInstance3.on("data-changed", function (sender, e) {
+            $('#eventhnd3').val($('#eventhnd3').val() + 'data-changed to ' + e.value + '\n');
+            console.log("sender: ", sender);
+            console.log("e", e);
+        });
+    });
+</script>
 </html>

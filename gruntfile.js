@@ -7,6 +7,8 @@ module.exports = function (grunt) {
                 srcFiles: [
                     "src/NamespaceDeclares.js",
                     "src/InterfaceAndEvents.js",
+                    "src/FormHelpers.js",
+                    "src/FieldRenderers/*.js",
                     "src/FormRenderers/*.js",
                     "src/FormWidget.js"
                 ],

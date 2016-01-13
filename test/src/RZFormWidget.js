@@ -45,6 +45,127 @@ rz.widgets.RZFormWidgetHelpers = {
 
 
 /**
+ * Created by Anderson on 13/01/2016.
+ */
+rz.widgets.formHelpers = {
+    fieldRenderers: {},
+    renderDataRows: function (sb, params, renderDataRow) {
+        if (params.fields !== undefined) {
+            params.fields.forEach(function (it, ix) {
+                renderDataRow(sb, it, ix);
+            });
+        }
+    },
+    renderDataFieldByType: function (sb, field, containerID) {
+        this.fieldRenderers[field.type].render(sb, field, containerID);
+    },
+    resolveModelName: function (field, generatedID) {
+        return (field.model !== undefined && field.model.match(/^[a-zA-Z]+[0-9]*(\.[a-zA-Z]+[0-9]*)*$/) != null) ? field.model : generatedID + "_data";
+    },
+    getInitialValueData: function (field) {
+        var data = field.initialValue;
+        if (data === undefined) {
+            return "";
+        }
+        else {
+            return (typeof(data) === "object") ? "object-data:[" + btoa(JSON.stringify(data)) + "]" : data;
+        }
+    },
+    createFieldRenderer: function (n, d) {
+        this.fieldRenderers[n] = d;
+    },
+    bindEventHandlers: function (sender) {
+        var rcount = sender.fieldCount();
+        for (var i = 0; i < rcount; i++) {
+            var id = sender.getFieldIdAt(i);
+            var type = $("#" + id).data("fieldtype");
+            this.fieldRenderers[type].bindEvents(id, this.emit, sender);
+        }
+    },
+    bindEventHandlersOfField: function (type,id,sender) {
+        this.fieldRenderers[type].bindEvents(id, this.emit, sender);
+    },
+    doPosRenderActions: function (sender) {
+        var rcount = sender.fieldCount();
+        for (var i = 0; i < rcount; i++) {
+            var id = sender.getFieldIdAt(i);
+            var type = $("#" + id).data("fieldtype");
+            if (this.fieldRenderers[type].doPosRenderActions !== undefined) {
+                this.fieldRenderers[type].doPosRenderActions(id, sender);
+            }
+        }
+    },
+    doPosRenderActionsOfField: function (type,id, sender) {
+        if (this.fieldRenderers[type].doPosRenderActions !== undefined) {
+            this.fieldRenderers[type].doPosRenderActions(id, sender);
+        }
+    },
+    getValueOfField : function (id) {
+        var fieldType = $(id).data("fieldtype");
+        return this.fieldRenderers[fieldType].getValue(id + "_" + fieldType);
+    },
+    setValueOfField : function (id, newValue) {
+        var fieldType = $(id).data("fieldtype");
+        this.fieldRenderers[fieldType].setValue(id + "_" + fieldType, newValue);
+    },
+    emit : function (n, d,sender) {
+        var handlers = sender.getEventHandlers();
+        if (handlers[n] !== undefined && handlers[n].length > 0) {
+            handlers[n].forEach(function (it) {
+                it(sender,d);
+            });
+        }
+    }
+};
+/**
+ * Created by Anderson on 13/01/2016.
+ */
+rz.widgets.formHelpers.createFieldRenderer("list", {
+    render: function (sb, field, containerID) {
+        sb.appendFormat('<select id="{0}" name="{0}" class="form-control">', containerID);
+        field.listItems.forEach(function (it) {
+            sb.appendFormat('   <option value="{1}" {2}>{0}</option>', it.label, it.value, (it.value == field.value) ? "selected" : "");
+        });
+        sb.appendFormat('</select>');
+
+    },
+    getValue: function (id) {
+        return $(id).val();
+    },
+    setValue: function (id, newValue) {
+        $(id).val(newValue);
+    },
+    bindEvents: function (id, emit, sender) {
+        $("#" + id).change(function (e) {
+            emit("data-changed", {fieldid: id,value: e.target.value,src: "usr"},sender);
+        });
+    },
+    doPosRenderActions: function (id) {
+    }
+});
+/**
+ * Created by Anderson on 13/01/2016.
+ */
+rz.widgets.formHelpers.createFieldRenderer("text", {
+    render: function (sb, field, containerID) {
+        sb.appendFormat('<input id="{1}" name="{1}" type="text" value="{0}" class="form-control">', field.value || "", containerID);
+        return "containerID" + "_input";
+    },
+    getValue: function (id) {
+        return $(id).val();
+    },
+    setValue: function (id, newValue) {
+        $(id).val(newValue || "");
+    },
+    bindEvents: function (id, emit, sender) {
+        $("#" + id).change(function (e) {
+            emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
+        });
+    },
+    doPosRenderActions: function (id, $this) {
+    }
+});
+/**
  * Created by Anderson on 12/01/2016.
  */
 rz.widgets.FormRenderers["default"] = function (params, sender) {

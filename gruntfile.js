@@ -23,6 +23,7 @@ module.exports = function (grunt) {
                         var $this = this;
                         var libs = [
                             "lib/jquery-2.1.4.min.js",
+                            "lib/jasmine-query.js",
                             "lib/RZClientEngine-0.0.1.min.js"
                         ];
                         var output = '';
@@ -64,6 +65,12 @@ module.exports = function (grunt) {
                     src: 'dist/RZFormWidget.js',
                     dest: 'test/src/RZFormWidget.js'
                 },
+                test_lib:{
+                    cwd: 'lib',
+                    src: '*.js',
+                    dest: 'test/lib',
+                    expand:true
+                },
                 test_template: {
                     options: {
                         processContent: function (content) {
@@ -91,7 +98,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jasmine');
 
 
-    grunt.registerTask('default', ['concat', 'uglify', 'copy:test', 'copy:test_template']);
+    grunt.registerTask('default', ['concat', 'uglify', 'copy:test','copy:test_lib', 'copy:test_template']);
     grunt.registerTask('test', ['jasmine']);
 
 };

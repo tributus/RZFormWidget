@@ -6,18 +6,12 @@
 
     <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.4.1/jasmine_favicon.png">
     <link rel="stylesheet" href="lib/jasmine-2.4.1/jasmine.css">
-    <script src="lib/jasmine-2.4.1/jasmine.js"></script>
-    <script src="lib/jasmine-2.4.1/jasmine-html.js"></script>
-    <script src="lib/jasmine-2.4.1/boot.js"></script>
 
     <!-- libs -->
     <%= options.test.getLibs() %>
 
     <!-- source files -->
     <%= options.test.getFilesToTest() %>
-
-    <!-- specs -->
-    <%= options.test.getSpecs() %>
     <style>
         body{
             padding-top: 20px;
@@ -39,6 +33,56 @@
 
 <body>
 <nav>RuteZangada Widgets</nav>
+<div id="formContainer" style="display: none;"></div>
+<script>
+    var formFields = [
+        {
+            fieldGroup: true,
+            groupLabel: "Geral",
+            fields: [
+                {model: "PrimeiroNome", label: "Primeiro nome", type: "text", id: "r0", value:"Valor inicial do campo", initialValue: ""},
+                {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""}
+            ]
+        },
+        {
+            fieldGroup: true,
+            groupLabel: "Outras informações",
+            fields: [{
+                model: "form.f3", label: "Field 2", value: "1", type: "list", listItems: [
+                    {label: "lItem 1", value: 0},
+                    {label: "lItem 2", value: 1},
+                    {label: "lItem 3", value: 2}
+                ], initialValue: null
+            },
+                {model: "Obs", label: "Obs", type: "text", id: "r2", initialValue: ""},
+                {
+                    fieldGroup: true,
+                    groupdType: "collapse",
+                    collapsed: true,
+                    //collapsible:false,
+                    groupLabel: "Endereço",
+                    fields: [
+                        {model: "endereco.rua", label: "Rua"},
+                        {model: "endereco.bairro", label: "Bairro"},
+                        {model: "endereco.cidade", label: "Cidade"},
+                        {model: "endereco.cep", label: "CEP"}
+                    ]
+                }
+            ]
+        }
+    ];
+
+    var formData = {
+        horizontal: true,
+        fields: formFields
+    };
+    instance = ruteZangada.renderWidget("Form", "formContainer", formData);
+</script>
 </body>
 
 </html>
+<script src="lib/jasmine-2.4.1/jasmine.js"></script>
+<script src="lib/jasmine-2.4.1/jasmine-html.js"></script>
+<script src="lib/jasmine-2.4.1/boot.js"></script>
+<!-- specs -->
+<%= options.test.getSpecs() %>

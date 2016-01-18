@@ -22,13 +22,13 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         var hasTabs = isElegibleFormTabPanel();
         if (hasTabs) {
             renderTabPanels(sb);
-            sb.append('<div class="tab-content">');
+            //sb.append('<div class="tab-content">');
         }
 
         rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
-        if (hasTabs) {
-            sb.append('</div>');
-        }
+        //if (hasTabs) {
+        //    sb.append('</div>');
+        //}
         sb.append('  </form>');
         sb.append('</div>');
         $("#" + target).append(sb.toString());
@@ -57,17 +57,19 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
 
     var renderTabPanels = function (sb) {
         var actidx = activeTabIndex();
-        sb.appendFormat('<ul class="nav nav-tabs" role="tablist">');
+        sb.appendFormat('<div class="ui top attached tabular menu rz-tabpanel">');
         $this.params.fields.forEach(function (it, id) {
             var targetID = generateRandomID(12);
-            sb.appendFormat('<li role="presentation" class="{2}"><a href="#{1}" aria-controls="{1}" role="tab" data-toggle="tab">{0}</a></li>'
+            //<a class="item active" data-tab="first">First</a>
+            sb.appendFormat('<a class="item {2}" data-tab="{1}">{0}</a>'
                 , it.groupLabel
                 , targetID
                 , (id == actidx) ? "active" : "");
+
             it.groupID = targetID;
             it.active = (id == actidx);
         });
-        sb.appendFormat('</ul>');
+        sb.appendFormat('</div>');
     };
 
     var renderCollapseContainer = function (sb, fieldID, field) {
@@ -98,9 +100,9 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     var renderTabContainer = function (sb, field) {
-        sb.appendFormat('<div id="{0}" role="tabpanel" class="tab-pane fade {1}">',
+        sb.appendFormat('<div class="ui bottom attached tab segment {1}" data-tab="{0}">',
             field.groupID,
-            (field.active) ? "in active" : ""
+            (field.active) ? "active" : ""
         );
         field.fields.forEach(function (it) {
             renderDataField(sb, it);

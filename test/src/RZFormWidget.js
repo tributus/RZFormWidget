@@ -87,6 +87,9 @@ rz.widgets.formHelpers = {
     },
     doPosRenderActions: function (sender) {
         var rcount = sender.fieldCount();
+        $("#" + sender.baseID + " .rz-tabpanel .item").tab();
+        $("#" + sender.baseID + " .ui.accordion").accordion();
+
         for (var i = 0; i < rcount; i++) {
             var id = sender.getFieldIdAt(i);
             var type = $("#" + id).data("fieldtype");
@@ -183,22 +186,20 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     this.render = function (target, params) {
         $this.params = params;
         $this.target = target;
+        var baseID = target+"base_form";
         var sb = new StringBuilder();
         sb.append('<div class="form-widget">');
-        sb.appendFormat('  <form id="{0}base_form" class="{1}">', target, (params.horizontal) ? "form-horizontal" : "");
+        sb.appendFormat('  <form id="{0}" class="{1} ui form">', baseID, (params.horizontal) ? "form-horizontal" : "");
         var hasTabs = isElegibleFormTabPanel();
         if (hasTabs) {
             renderTabPanels(sb);
-            sb.append('<div class="tab-content">');
         }
 
         rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
-        if (hasTabs) {
-            sb.append('</div>');
-        }
         sb.append('  </form>');
         sb.append('</div>');
         $("#" + target).append(sb.toString());
+        $this.sender.baseID = baseID;
         rz.widgets.formHelpers.doPosRenderActions($this.sender);
         rz.widgets.formHelpers.bindEventHandlers($this.sender);
     };
@@ -224,20 +225,37 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
 
     var renderTabPanels = function (sb) {
         var actidx = activeTabIndex();
-        sb.appendFormat('<ul class="nav nav-tabs" role="tablist">');
+        sb.appendFormat('<div class="ui top attached tabular menu rz-tabpanel">');
         $this.params.fields.forEach(function (it, id) {
             var targetID = generateRandomID(12);
-            sb.appendFormat('<li role="presentation" class="{2}"><a href="#{1}" aria-controls="{1}" role="tab" data-toggle="tab">{0}</a></li>'
+            //<a class="item active" data-tab="first">First</a>
+            sb.appendFormat('<a class="item {2}" data-tab="{1}">{0}</a>'
                 , it.groupLabel
                 , targetID
                 , (id == actidx) ? "active" : "");
+
             it.groupID = targetID;
             it.active = (id == actidx);
         });
-        sb.appendFormat('</ul>');
+        sb.appendFormat('</div>');
     };
 
     var renderCollapseContainer = function (sb, fieldID, field) {
+        sb.appendFormat('<div class="ui styled fluid accordion">');
+        sb.appendFormat('    <div class="active title">');
+        sb.appendFormat('    <i class="dropdown icon"></i>');
+        sb.appendFormat('    {0}',field.groupLabel || "");
+        sb.appendFormat('</div>');
+        sb.appendFormat('<div class="active content">');
+
+        field.fields.forEach(function (it) {
+            renderDataField(sb, it);
+        });
+
+        sb.appendFormat('</div>');
+        sb.appendFormat('</div>');
+
+        /*
         sb.appendFormat('<div class="panel-group col-sm-offset-2" role="tablist">');
         sb.appendFormat('	<div class="panel panel-default">');
         sb.appendFormat('		<div class="panel-heading" role="tab" id="{0}_clgh">', fieldID);
@@ -262,12 +280,13 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.appendFormat('		</div>');
         sb.appendFormat('	</div>');
         sb.appendFormat('</div>');
+        */
     };
 
     var renderTabContainer = function (sb, field) {
-        sb.appendFormat('<div id="{0}" role="tabpanel" class="tab-pane fade {1}">',
+        sb.appendFormat('<div class="ui bottom attached tab segment {1}" data-tab="{0}">',
             field.groupID,
-            (field.active) ? "in active" : ""
+            (field.active) ? "active" : ""
         );
         field.fields.forEach(function (it) {
             renderDataField(sb, it);
@@ -290,21 +309,24 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row form-group">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row  {4} field">',
+
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
-                rz.widgets.formHelpers.getInitialValueData(field)
+                rz.widgets.formHelpers.getInitialValueData(field),
+                (h)? "inline":""
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
-            sb.appendFormat('<label for="{1}" class="{2} {3}">{0}</label>',
+            sb.appendFormat('<label for="{1}" class="{2}">{0}</label>',
                 field.label,
                 inputID,
-                "control-label",
-                (h) ? $this.params.formLabelSizeClass : "");
-            if (h) sb.appendFormat('<div class="{0}">', $this.params.formValueSizeClass);
+                "control-label"
+                //,(h) ? $this.params.formLabelSizeClass : ""
+            );
+            //if (h) sb.appendFormat('<div class="{0}">', $this.params.formValueSizeClass);
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
-            if (h) sb.appendFormat('</div>');
+            //if (h) sb.appendFormat('</div>');
             sb.append('</div>');
         }
     };
@@ -616,13 +638,15 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         $this.target = target;
         var sb = new StringBuilder();
         sb.append('<div class="grid-form">');
-        sb.appendFormat('  <table id="{0}base_table">', target);
+        sb.append('<form class="ui form">');
+        sb.appendFormat('  <table id="{0}base_table" class="ui celled table">', target);
         renderHeader(sb, params);
         sb.append('    <tbody>');
         rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
 
         sb.append('    </tbody>');
         sb.append('  </table>');
+        sb.append('</form>');
         sb.append('</div>');
         $("#" + target).append(sb.toString());
         rz.widgets.formHelpers.doPosRenderActions($this.sender);

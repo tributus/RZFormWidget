@@ -41,6 +41,9 @@ rz.widgets.formHelpers = {
     },
     doPosRenderActions: function (sender) {
         var rcount = sender.fieldCount();
+        $("#" + sender.baseID + " .rz-tabpanel .item").tab();
+        $("#" + sender.baseID + " .ui.accordion").accordion();
+
         for (var i = 0; i < rcount; i++) {
             var id = sender.getFieldIdAt(i);
             var type = $("#" + id).data("fieldtype");

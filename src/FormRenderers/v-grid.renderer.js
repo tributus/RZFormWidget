@@ -19,13 +19,15 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         $this.target = target;
         var sb = new StringBuilder();
         sb.append('<div class="grid-form">');
-        sb.appendFormat('  <table id="{0}base_table">', target);
+        sb.append('<form class="ui form">');
+        sb.appendFormat('  <table id="{0}base_table" class="ui celled table">', target);
         renderHeader(sb, params);
         sb.append('    <tbody>');
         rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
 
         sb.append('    </tbody>');
         sb.append('  </table>');
+        sb.append('</form>');
         sb.append('</div>');
         $("#" + target).append(sb.toString());
         rz.widgets.formHelpers.doPosRenderActions($this.sender);

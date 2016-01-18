@@ -67,16 +67,34 @@
 <p>grid-row renderer</p>
 
 <div>
-    <table>
+    <form class="ui form">
+    <table class="ui celled table">
         <thead>
         <tr>
             <th>C1</th>
             <th>C2</th>
             <th>C3</th>
+            <th>C4</th>
+            <th>C5</th>
+            <th>C6</th>
+            <th>C7</th>
+            <th>C8</th>
         </tr>
         </thead>
-        <tbody id="smform3"></tbody>
+        <tbody id="smform3">
+        <tr>
+            <td>Data 1</td>
+            <td>Data 2</td>
+            <td>Data 3</td>
+            <td>Data 4</td>
+            <td>Data 5</td>
+            <td>Data 6</td>
+            <td>Data 7</td>
+            <td>Data 8</td>
+        </tr>
+        </tbody>
     </table>
+    </form>
 </div>
 <button id="btn31" class="btn btn-default">getFormData()</button>
 <button id="btn32" class="btn btn-default">fieldCount()</button>
@@ -94,7 +112,34 @@
 <div id="viewdata3"></div>
 <textarea id="eventhnd3"></textarea>
 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
+
+<div class="ui styled accordion">
+    <div class="active title">
+        <i class="dropdown icon"></i>
+        What is a dog?
+    </div>
+    <div class="active content">
+        <p>A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a welcome
+            guest in many households across the world.</p>
+    </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 </body>
 <script>
     /*****************************************exemplo 1**********************************************/
@@ -104,7 +149,14 @@
             fieldGroup: true,
             groupLabel: "Geral",
             fields: [
-                {model: "PrimeiroNome", label: "Primeiro nome", type: "text", id: "r0", value:"Valor inicial", initialValue: ""},
+                {
+                    model: "PrimeiroNome",
+                    label: "Primeiro nome",
+                    type: "text",
+                    id: "r0",
+                    value: "Valor inicial",
+                    initialValue: ""
+                },
                 {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""}
             ]
         },
@@ -120,23 +172,23 @@
             },
                 {model: "Obs", label: "Obs", type: "text", id: "r2", initialValue: ""},
                 {
-                    fieldGroup:true,
-                    groupdType:"collapse",
-                    collapsed:true,
+                    fieldGroup: true,
+                    groupdType: "collapse",
+                    collapsed: true,
                     //collapsible:false,
-                    groupLabel:"Endereço",
-                    fields:[
-                        {model:"endereco.rua", label:"Rua"},
-                        {model:"endereco.bairro", label:"Bairro"},
-                        {model:"endereco.cidade", label:"Cidade"},
-                        {model:"endereco.cep", label:"CEP"}
+                    groupLabel: "Endereço",
+                    fields: [
+                        {model: "endereco.rua", label: "Rua"},
+                        {model: "endereco.bairro", label: "Bairro"},
+                        {model: "endereco.cidade", label: "Cidade"},
+                        {model: "endereco.cep", label: "CEP"}
                     ]
                 }
             ]
         }
     ];
 
-    var formFields2 =  [
+    var formFields2 = [
         {model: "Cliente.Nome", label: "Nome", type: "text", id: "r0", initialValue: ""},
         {label: "Field 2", value: "3", type: "text"},
         {
@@ -148,7 +200,7 @@
         }
     ];
 
-    var formFields3 =[
+    var formFields3 = [
         {model: "PrimeiroNome", label: "Primeiro nome", type: "text", id: "r0", initialValue: ""},
         {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""},
         {
@@ -168,7 +220,7 @@
     ];
 
     var formData = {
-        horizontal: true,
+        horizontal: false,
         fields: formFields
     };
     var widgetInstance = ruteZangada.renderWidget("Form", "smform", formData);

@@ -179,12 +179,14 @@ rz.widgets.formHelpers.createFieldRenderer("text", {
 rz.widgets.FormRenderers["default"] = function (params, sender) {
     var $this = this;
     var initialize = function () {
-        //set defaults
-        if (params === undefined) params = {};
-        params.horizontal = params.horizontal || false;
-        params.formLabelSizeClass = params.formLabelSizeClass || "col-sm-2";
-        params.formValueSizeClass = params.formValueSizeClass || "col-sm-10";
-        $this.params = params;
+        //if (params === undefined) params = {};
+        var defaultParams = {
+            horizontal : false,
+            formLabelSizeClass:"col-sm-2",
+            formValueSizeClass:"col-sm-10"
+        };
+
+        $this.params = $.extend(true, {}, defaultParams, params);
         $this.sender = sender;
     };
 
@@ -233,12 +235,10 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.appendFormat('<div class="ui top attached tabular menu rz-tabpanel">');
         $this.params.fields.forEach(function (it, id) {
             var targetID = generateRandomID(12);
-            //<a class="item active" data-tab="first">First</a>
             sb.appendFormat('<a class="item {2}" data-tab="{1}">{0}</a>'
                 , it.groupLabel
                 , targetID
                 , (id == actidx) ? "active" : "");
-
             it.groupID = targetID;
             it.active = (id == actidx);
         });
@@ -300,11 +300,8 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
                 field.label,
                 inputID,
                 "control-label"
-                //,(h) ? $this.params.formLabelSizeClass : ""
             );
-            //if (h) sb.appendFormat('<div class="{0}">', $this.params.formValueSizeClass);
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
-            //if (h) sb.appendFormat('</div>');
             sb.append('</div>');
         }
     };
@@ -406,7 +403,6 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
                 last = last[it];
             });
         }
-
         for (var i = 0; i < rcount; i++) {
             var id = $this.getFieldIdAt(i);
             var model = $("#" + id).data("model");
@@ -427,7 +423,6 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             $this.setValueAt(i, initialValue);
         }
     };
-
     initialize();
 };
 /**
@@ -437,9 +432,10 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
 rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
     var $this = this;
     var initialize = function () {
-        //set defaults
-        if (params === undefined) params = {};
-        params.renderTableContainer = params.renderTableContainer || "Label";
+        var defaultParams = {
+            renderTableContainer : "Label"
+        };
+        $this.params = $.extend(true, {}, defaultParams, params);
 
         $this.params = params;
         $this.sender = sender;
@@ -603,15 +599,13 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
 rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     var $this = this;
     var initialize = function () {
-        //set defaults
-        if (params === undefined) params = {};
-        params.displayHeader = params.displayHeader || false;
-        params.headerLabel = params.headerLabel || "Label";
-        params.headerValue = params.headerValue || "Value";
-
-        $this.params = params;
+        var defaultParams = {
+            displayHeader : false,
+            headerLabel:"Label",
+            headerValue:"Value"
+        };
+        $this.params = $.extend(true, {}, defaultParams, params);
         $this.sender = sender;
-
     };
 
     this.render = function (target, params) {

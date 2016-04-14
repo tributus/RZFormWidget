@@ -5,9 +5,10 @@
 rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
     var $this = this;
     var initialize = function () {
-        //set defaults
-        if (params === undefined) params = {};
-        params.renderTableContainer = params.renderTableContainer || "Label";
+        var defaultParams = {
+            renderTableContainer : "Label"
+        };
+        $this.params = $.extend(true, {}, defaultParams, params);
 
         $this.params = params;
         $this.sender = sender;

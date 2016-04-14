@@ -5,15 +5,13 @@
 rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     var $this = this;
     var initialize = function () {
-        //set defaults
-        if (params === undefined) params = {};
-        params.displayHeader = params.displayHeader || false;
-        params.headerLabel = params.headerLabel || "Label";
-        params.headerValue = params.headerValue || "Value";
-
-        $this.params = params;
+        var defaultParams = {
+            displayHeader : false,
+            headerLabel:"Label",
+            headerValue:"Value"
+        };
+        $this.params = $.extend(true, {}, defaultParams, params);
         $this.sender = sender;
-
     };
 
     this.render = function (target, params) {

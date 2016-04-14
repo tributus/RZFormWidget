@@ -1,9 +1,11 @@
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget Namespace
  */
 rz.widgets.FormRenderers = {};
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget Interface Definition
  */
 rz.widgets.RZFormWidgetHelpers = {
     FormWidgetInterface : [
@@ -122,6 +124,7 @@ rz.widgets.formHelpers = {
 };
 /**
  * Created by Anderson on 13/01/2016.
+ * Simple list renderer
  */
 rz.widgets.formHelpers.createFieldRenderer("list", {
     render: function (sb, field, containerID) {
@@ -148,6 +151,7 @@ rz.widgets.formHelpers.createFieldRenderer("list", {
 });
 /**
  * Created by Anderson on 13/01/2016.
+ * Input text renderer
  */
 rz.widgets.formHelpers.createFieldRenderer("text", {
     render: function (sb, field, containerID) {
@@ -170,6 +174,7 @@ rz.widgets.formHelpers.createFieldRenderer("text", {
 });
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget default renderer
  */
 rz.widgets.FormRenderers["default"] = function (params, sender) {
     var $this = this;
@@ -454,6 +459,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
 };
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget Grid Row Renderer
  */
 rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
     var $this = this;
@@ -619,6 +625,7 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
 };
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget Vertical Grid Renderer
  */
 rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     var $this = this;

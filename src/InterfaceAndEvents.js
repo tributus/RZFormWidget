@@ -1,5 +1,6 @@
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget Interface Definition
  */
 rz.widgets.RZFormWidgetHelpers = {
     FormWidgetInterface : [

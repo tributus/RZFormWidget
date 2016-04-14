@@ -1,5 +1,6 @@
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget Grid Row Renderer
  */
 rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
     var $this = this;

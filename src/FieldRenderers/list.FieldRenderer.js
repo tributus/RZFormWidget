@@ -1,5 +1,6 @@
 /**
  * Created by Anderson on 13/01/2016.
+ * Simple list renderer
  */
 rz.widgets.formHelpers.createFieldRenderer("list", {
     render: function (sb, field, containerID) {

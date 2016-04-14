@@ -1,5 +1,6 @@
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget Vertical Grid Renderer
  */
 rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     var $this = this;

@@ -1,5 +1,6 @@
 /**
  * Created by Anderson on 13/01/2016.
+ * Input text renderer
  */
 rz.widgets.formHelpers.createFieldRenderer("text", {
     render: function (sb, field, containerID) {

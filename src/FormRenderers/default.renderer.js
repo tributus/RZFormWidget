@@ -1,5 +1,6 @@
 /**
  * Created by Anderson on 12/01/2016.
+ * Widget default renderer
  */
 rz.widgets.FormRenderers["default"] = function (params, sender) {
     var $this = this;

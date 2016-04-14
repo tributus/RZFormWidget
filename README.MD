@@ -4,7 +4,11 @@ Webform view Widget
 
 ##Dependencies:
 RZClientEngine >=0.0.1;
-
+##Installation:
+```html
+Bower:
+bower install rzformwidget
+```
 ##Usage:
 
 ```html
@@ -31,10 +35,6 @@ var widgetInstance = ruteZangada.renderWidget("Form", "elementID", params);
         headerLabel:"Label",            //Label column header
         headerValue:"Value"             //Value column header
     };
-    
-    
-                
 
-
-##Actions
-##Events
+##Operations and events
+For a complete list of widget operations and events, see the src/InterfaceAndEvents.js file 

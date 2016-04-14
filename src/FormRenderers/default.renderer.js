@@ -85,33 +85,6 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
 
         sb.appendFormat('</div>');
         sb.appendFormat('</div>');
-
-        /*
-        sb.appendFormat('<div class="panel-group col-sm-offset-2" role="tablist">');
-        sb.appendFormat('	<div class="panel panel-default">');
-        sb.appendFormat('		<div class="panel-heading" role="tab" id="{0}_clgh">', fieldID);
-        sb.appendFormat('			<h4 class="panel-title">');
-        sb.appendFormat('				<a class="{2}" role="button" data-toggle="collapse" href="#{0}_clg" aria-expanded="{3}" aria-controls="{0}_clg"> {1} </a>',
-
-            fieldID,
-            field.groupLabel || "",
-            (field.collapsed) ? "collapsed" : "",
-            !!field.collapsed);
-        sb.appendFormat('			</h4>');
-        sb.appendFormat('		</div>');
-        sb.appendFormat('		<div id="{0}_clg" class="panel-collapse collapse {2}" role="tabpanel" aria-labelledby="{0}_clgh" aria-expanded="{1}">',
-            fieldID,
-            !!field.collapsed,
-            (field.collapsed) ? "" : "in");
-
-        field.fields.forEach(function (it) {
-            renderDataField(sb, it);
-        });
-
-        sb.appendFormat('		</div>');
-        sb.appendFormat('	</div>');
-        sb.appendFormat('</div>');
-        */
     };
 
     var renderTabContainer = function (sb, field) {

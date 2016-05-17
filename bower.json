@@ -18,5 +18,17 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "devDependencies": {
+    "semantic-ui-reset": "^2.1.7",
+    "semantic-ui-site": "^2.1.7",
+    "semantic-ui-icon": "^2.1.7",
+    "semantic-ui-form": "^2.1.7",
+    "semantic-ui-table": "^2.1.7",
+    "semantic-ui-tab": "^2.1.7",
+    "semantic-ui-accordion": "^2.1.8",
+    "semantic-ui-menu": "^2.1.7",
+    "semantic-ui-segment": "^2.1.7",
+    "RZClientEngine": "rutezangada-client-engine#^0.0.8"
+  }
 }

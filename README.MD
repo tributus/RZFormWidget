@@ -7,7 +7,7 @@ RZClientEngine >=0.0.1;
 ##Installation:
 ```html
 Bower:
-bower install rzformwidget
+bower install rutezangada-formwidget
 ```
 ##Usage:
 

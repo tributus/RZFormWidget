@@ -1,6 +1,6 @@
 {
-  "name": "RZFormWidget",
-  "version": "0.0.1",
+  "name": "rutezangada-formwidget",
+  "version": "0.1.0",
   "description": "Widget Formularios",
   "main": "index.js",
   "scripts": {

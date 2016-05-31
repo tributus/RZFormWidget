@@ -98,36 +98,55 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.appendFormat('</div>');
     };
 
+    var renderFieldGroupContainer = function(sb, fieldID, field){
+        var c = ["zero", "one","two","three","four","five","six","seven", "eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen"];
+        var fieldCount =  field.fields.count;
+        if(fieldCount===undefined || fieldCount > 16) fieldCount=2;
+        var fieldCountName = field.columCount ||c[fieldCount];
+        sb.appendFormat('<div class="{0} fields">',fieldCountName);
+        field.fields.forEach(function (it) {
+            renderDataField(sb, it);
+        });
+        sb.appendFormat('</div>');
+    };
+
     var renderDataField = function (sb, field) {
         var fieldID = (field.id || field.model || "field_" + generateRandomID(8)).replace(/\./g, "_");
         if (field.fieldGroup) {
-            var groupType = field.groupdType || "tabpanel";
+            var groupType = field.groupType || "tabpanel";
             if (groupType == "tabpanel") {
                 renderTabContainer(sb, field);
             }
             else if (groupType == "collapse") {
                 renderCollapseContainer(sb, fieldID, field);
             }
+            else if(groupType =="fieldgroup"){
+                renderFieldGroupContainer(sb,fieldID, field);
+            }
         }
         else {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row  {4} field">',
-
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
-                (h)? "inline":""
+                (h)? "inline fields":"field",
+                (field.wide !==undefined)? " " + field.wide + " wide":""
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
+            if(h) sb.appendFormat('<div class="sixteen wide field">');
+
+
             sb.appendFormat('<label for="{1}" class="{2}">{0}</label>',
                 field.label,
                 inputID,
                 "control-label"
             );
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
+            if(h) sb.appendFormat('</div>');
             sb.append('</div>');
         }
     };

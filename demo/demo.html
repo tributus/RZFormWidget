@@ -134,21 +134,34 @@
             groupLabel: "Geral",
             fields: [
                 {
-                    model: "PrimeiroNome",
-                    label: "Primeiro nome",
-                    type: "text",
-                    id: "r0",
-                    value: "Valor inicial",
-                    initialValue: ""
-                },
-                {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""}
+                    fieldGroup:true,
+                    groupType:"fieldgroup",
+                    columCount:"two",
+                    fields:[
+                        {
+                            model: "PrimeiroNome",
+                            label: "Primeiro nome",
+                            type: "text",
+                            id: "r0",
+                            value: "Valor inicial",
+                            initialValue: "",
+                            attributes:[
+                                {name:"placeholder", value:"informe o primeiro nome"},
+                                {name:"data-foo", value:"ba"}
+                            ]
+                        },
+                        {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""}
+                    ]
+                }
+                    //, outros fields
             ]
         },
         {
             fieldGroup: true,
             groupLabel: "Outras informações",
-            fields: [{
-                model: "form.f3", label: "Field 2", value: "1", type: "list", listItems: [
+            fields: [
+                {
+                    model: "form.f3", label: "Field 2", value: "1", type: "list", listItems: [
                     {label: "lItem 1", value: 0},
                     {label: "lItem 2", value: 1},
                     {label: "lItem 3", value: 2}
@@ -157,15 +170,24 @@
                 {model: "Obs", label: "Obs", type: "text", id: "r2", initialValue: ""},
                 {
                     fieldGroup: true,
-                    groupdType: "collapse",
+                    groupType: "collapse",
                     collapsed: true,
                     //collapsible:false,
                     groupLabel: "Endereço",
                     fields: [
                         {model: "endereco.rua", label: "Rua"},
-                        {model: "endereco.bairro", label: "Bairro"},
-                        {model: "endereco.cidade", label: "Cidade"},
-                        {model: "endereco.cep", label: "CEP"}
+                        {
+                            fieldGroup:true,
+                            groupType: "fieldgroup",
+                            columnCount:"three",
+                            fields:[
+                                {model: "endereco.bairro", label: "Bairro"},
+                                {model: "endereco.cidade", label: "Cidade"},
+                                {model: "endereco.cep", label: "CEP", wide:"two"}
+                            ]
+
+                        }
+
                     ]
                 }
             ]

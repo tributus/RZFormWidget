@@ -155,7 +155,20 @@ rz.widgets.formHelpers.createFieldRenderer("list", {
  */
 rz.widgets.formHelpers.createFieldRenderer("text", {
     render: function (sb, field, containerID) {
-        sb.appendFormat('<input id="{1}" name="{1}" type="text" value="{0}" class="form-control">', field.value || "", containerID);
+        var resolveAttributes = function(){
+            var attr = field.attributes;
+            if(attr===undefined || attr.length <= 0){
+                return "";
+            }
+            else{
+                var ret = " ";
+                attr.forEach(function(at){
+                    ret += at.name + '="' + at.value + '" ';
+                });
+                return ret;
+            }
+        };
+        sb.appendFormat('<input id="{1}" name="{1}" type="text" value="{0}" class="form-control"{2}>', field.value || "", containerID,resolveAttributes());
         return "containerID" + "_input";
     },
     getValue: function (id) {
@@ -169,8 +182,8 @@ rz.widgets.formHelpers.createFieldRenderer("text", {
             emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
         });
     },
-    doPosRenderActions: function (id, $this) {
-    }
+    doPosRenderActions: function (id, $this) {}
+
 });
 /**
  * Created by Anderson on 12/01/2016.
@@ -272,36 +285,55 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.appendFormat('</div>');
     };
 
+    var renderFieldGroupContainer = function(sb, fieldID, field){
+        var c = ["zero", "one","two","three","four","five","six","seven", "eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen"];
+        var fieldCount =  field.fields.count;
+        if(fieldCount===undefined || fieldCount > 16) fieldCount=2;
+        var fieldCountName = field.columCount ||c[fieldCount];
+        sb.appendFormat('<div class="{0} fields">',fieldCountName);
+        field.fields.forEach(function (it) {
+            renderDataField(sb, it);
+        });
+        sb.appendFormat('</div>');
+    };
+
     var renderDataField = function (sb, field) {
         var fieldID = (field.id || field.model || "field_" + generateRandomID(8)).replace(/\./g, "_");
         if (field.fieldGroup) {
-            var groupType = field.groupdType || "tabpanel";
+            var groupType = field.groupType || "tabpanel";
             if (groupType == "tabpanel") {
                 renderTabContainer(sb, field);
             }
             else if (groupType == "collapse") {
                 renderCollapseContainer(sb, fieldID, field);
             }
+            else if(groupType =="fieldgroup"){
+                renderFieldGroupContainer(sb,fieldID, field);
+            }
         }
         else {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row  {4} field">',
-
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
-                (h)? "inline":""
+                (h)? "inline fields":"field",
+                (field.wide !==undefined)? " " + field.wide + " wide":""
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
+            if(h) sb.appendFormat('<div class="sixteen wide field">');
+
+
             sb.appendFormat('<label for="{1}" class="{2}">{0}</label>',
                 field.label,
                 inputID,
                 "control-label"
             );
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
+            if(h) sb.appendFormat('</div>');
             sb.append('</div>');
         }
     };

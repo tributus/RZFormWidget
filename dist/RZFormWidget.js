@@ -682,29 +682,36 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         }
     };
 
-    var renderFieldGroup = function (field, fieldID, sb) {
-        field.collapsible = (field.collapsible === undefined) ? true : field.collapsible;
-        var gid = "*_*".replace("*", $this.target).replace("*", fieldID);
-        sb.appendFormat('<tr id="{0}" class="vdgrid-group-header">', gid);
+    var renderFieldGroup = function (field, fieldID, sb,parentGroup) {
+        if(field.groupType !="fieldgroup") {
+            field.collapsible = (field.collapsible === undefined) ? true : field.collapsible;
+            var gid = "*_*".replace("*", $this.target).replace("*", fieldID);
+            sb.appendFormat('<tr id="{0}" class="vdgrid-group-header">', gid);
 
-        if (field.collapsible) {
-            sb.appendFormat('<td colspan="2"><a href="#" class="collapse-toggle-button">{0}</a></td>', field.groupLabel);
-        }
-        else {
-            sb.appendFormat('<td colspan="2"><span>{0}</span></td>', field.groupLabel);
-        }
-        sb.appendFormat('</tr>');
-        var groupInfoData = 'data-groupingid="*"'.replace('*', gid);
+            if (field.collapsible) {
+                sb.appendFormat('<td colspan="2"><a href="#" class="collapse-toggle-button">{0}</a></td>', field.groupLabel);
+            }
+            else {
+                sb.appendFormat('<td colspan="2"><span>{0}</span></td>', field.groupLabel);
+            }
+            sb.appendFormat('</tr>');
+            var groupInfoData = 'data-groupingid="*"'.replace('*', gid);
 
-        field.fields.forEach(function (it) {
-            renderDataField(sb, it, groupInfoData);
-        });
+            field.fields.forEach(function (it) {
+                renderDataField(sb, it, groupInfoData);
+            });
+        }
+        else{
+            field.fields.forEach(function (it) {
+                renderDataField(sb, it, parentGroup);
+            });
+        }
     };
 
     var renderDataField = function (sb, field,gidata) {
         var fieldID = (field.id || field.model || "row_" + generateRandomID(8)).replace(/\./g, "_");
         if (field.fieldGroup) {
-            renderFieldGroup(field, fieldID, sb);
+            renderFieldGroup(field, fieldID, sb,gidata);
         }
         else{
             field.type = field.type || "text";

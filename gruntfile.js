@@ -10,6 +10,7 @@ module.exports = function (grunt) {
                     "src/FormHelpers.js",
                     "src/FieldRenderers/*.js",
                     "src/FormRenderers/*.js",
+                    "src/FormValidators/*.js",
                     "src/FormWidget.js"
                 ],
                 test: {

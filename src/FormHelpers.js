@@ -3,6 +3,7 @@
  */
 rz.widgets.formHelpers = {
     fieldRenderers: {},
+    dataValidators:{},
     renderDataRows: function (sb, params, renderDataRow) {
         if (params.fields !== undefined) {
             params.fields.forEach(function (it, ix) {
@@ -27,6 +28,12 @@ rz.widgets.formHelpers = {
     },
     createFieldRenderer: function (n, d) {
         this.fieldRenderers[n] = d;
+    },
+    createFormValidator: function (n, d) {
+        this.dataValidators[n] = d;
+    },
+    validateField:function(n,s,v,p,h){
+        this.dataValidators[n](s,v,p,h);
     },
     bindEventHandlers: function (sender) {
         var rcount = sender.fieldCount();

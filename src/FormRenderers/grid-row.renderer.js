@@ -34,7 +34,7 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
 
-            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field">',
+            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field field">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
@@ -157,5 +157,52 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
             $this.setValueAt(i, initialValue);
         }
     };
+
+    /**
+     * validates de form data
+     * @param {function } validationResultHandler - method invoked after validation
+     */
+    this.validateForm = function(validationResultHandler){
+        var formData = $this.sender.getFormData();
+        //ao final: if(validationResultHandler !==undefined) validationResultHandler(sender,{result:false, errors:[...]})
+        if(params.validation.enabled){
+            $this.sender.validationReport = [];
+            params.validation.rules.forEach(function (rule) {
+                rz.widgets.formHelpers.validateField(rule.type,$this.sender,formData[rule.model] ,rule,function(result,params){
+                    if(!result){
+                        $this.sender.validationReport.push({failedRule:rule});
+                    }
+                });
+                $this.sender.isFormInvalid  = $this.sender.validationReport.length > 0;
+                $this.displayValidationReport();
+            })
+        }
+        else{
+            validationResultHandler($this.sender,{isValid:true});
+        }
+    };
+
+    this.displayValidationReport = function(){
+        var fieldsSelector = '#* .field'.replace('*',$this.target);
+        $(fieldsSelector).removeClass("error");
+        var fieldSelector = '#* [data-model="*"]'.replace('*',$this.target);
+        var reportTarget = $this.params.validation.reportTarget || "#" + $this.target + "_validation_report";
+        if($this.sender.validationReport !==undefined && $this.sender.validationReport.length > 0){
+            var sb = new StringBuilder();
+            sb.appendFormat('<div class="ui error message">');
+            sb.appendFormat('	<ul class="list">');
+            $this.sender.validationReport.forEach(function(item){
+                sb.appendFormat('<li>{0}</li>', item.failedRule.message);
+                $(fieldSelector.replace('*',item.failedRule.model)).addClass("error");
+            });
+            sb.appendFormat('	</ul>');
+            sb.appendFormat('</div>');
+            $(reportTarget).html(sb.toString());
+        }
+        else{
+            $(reportTarget).empty();
+        }
+    };
+    
     initialize();
 };

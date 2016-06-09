@@ -3,10 +3,22 @@
  */
 rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers.FormWidgetInterface,rz.widgets.RZFormWidgetHelpers.FormWidgetEventHandlers,function () {
     var $this = this;
+    this.validationReport = [];
     this.initialize = function (params, initialized) {
         var renderer = params.renderer || "default";
         $this.renderer = new rz.widgets.FormRenderers[renderer](params, $this);
+
+        $this.on("data-changed", function (sender, e) {
+            updateValidationStatus();
+        });
+
         initialized($this.renderer.params);
+    };
+
+    var updateValidationStatus = function(){
+        if($this.isFormInvalid){
+            $this.validateForm();
+        }
     };
 
     this.render = function (target, params) {
@@ -66,4 +78,12 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
     this.clearFormData = function () {
         $this.renderer.clearFormData();
     };
+
+    /**
+     * validates de form data
+     * @param {function } validationResultHandler - method invoked after validation
+     */
+    this.validateForm = function(validationResultHandler){
+        $this.renderer.validateForm(validationResultHandler)
+    }
 });

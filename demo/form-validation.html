@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-reset/reset.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-site/site.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-icon/icon.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-form/form.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-table/table.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-tab/tab.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-accordion/accordion.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-menu/menu.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-segment/segment.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-message/message.min.css">
+
+
+
+
+    <style id="demo-only-style">
+        .validation-report-container {
+            margin-top: 10px;
+        }
+    </style>
+
+    <script src="../bower_components/RZClientEngine/dist/RZClientEngine-standalone.min.js"></script>
+    <script src="../bower_components/semantic-ui-form/form.min.js"></script>
+    <script src="../bower_components/semantic-ui-tab/tab.min.js"></script>
+    <script src="../bower_components/semantic-ui-accordion/accordion.min.js"></script>
+    <script src="../dist/RZFormWidget.js"></script>
+
+
+    <!-- NODEPENDENCY  Referências de teste apenas-->
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic/dist/semantic.min.css">
+    <script src="../bower_components/semantic/dist/semantic.min.js"></script>
+    <!-- NODEPENDENCY -->
+</head>
+<body>
+<h1>Exemplo 1</h1>
+
+
+
+<div class="ui padded grid ">
+    <div class="one column row">
+        <div class="column">
+
+            <div class="ui selection dropdown">
+                <input type="hidden" name="gender">
+                <i class="dropdown icon"></i>
+                <div class="default text">Renderizador</div>
+                <div class="menu">
+                    <div class="item" data-value="0">default</div>
+                    <div class="item" data-value="1">v-grid</div>
+                    <div class="item" data-value="2">grid-row</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="one column row">
+        <div class="column">
+            <div id="smform"></div>
+        </div>
+    </div>
+    <div class="one column row">
+        <div class="column">
+            <button id="validateButton" class="ui primary button">Validar</button>
+        </div>
+    </div>
+    <div class="one column row">
+        <div class="column">
+            <div class="validation-report"></div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+</body>
+<script>
+    var formFields = [
+        {
+            fieldGroup: true,
+            groupLabel: "Descrição",
+            fields: [
+                {
+                    fieldGroup: true,
+                    groupType: "fieldgroup",
+                    columCount: "two",
+                    fields: [
+                        {
+                            model: "PrimeiroNome",
+                            label: "Primeiro nome",
+                            type: "text",
+                            id: "r0",
+                            attributes: [
+                                {name: "placeholder", value: "informe o primeiro nome"},
+                                {name: "data-foo", value: "ba"}
+                            ]
+                        },
+                        {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""}
+                    ]
+                },
+                {model: "Email", label: "Email", type: "text", id: "email"},
+                {model: "Idade", label: "Idade", type: "text", id: "idade"},
+                {
+                    model: "CNPJ",
+                    label: "CNPJ",
+                    type: "text",
+                    id: "cnpj",
+                    attributes:[
+                        {
+                            name:"placeholder",
+                            value:"ex: 08.313.481/0001-05"
+                        }
+                    ]
+                }
+            ]
+        }
+
+    ];
+    var formData = {
+        fields: formFields,
+        validation: {
+            enabled: true,
+            reportTarget: ".validation-report",
+            rules: [
+                {
+                    model: "PrimeiroNome",
+                    type: "required",
+                    message: "Informe o primeiro nome"
+                    /*,errorClassName:""*/
+                },
+                {
+                    model: "Email",
+                    type: "regex",
+                    message: "Formato do email incorreto",
+                    validateEmptyValues: false,
+                    regularExpression: "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+                },
+                {
+                    model: "CNPJ",
+                    type: "required",
+                    message: "Informe o CNPJ"
+                },
+                {
+                    model: "Idade",
+                    type:"range",
+                    message:"A idade deve estar entre 18 e 35 anos",
+                    minValue:18,
+                    maxValue:35,
+                    valueType:"number"
+                },
+                {
+                    model: "CNPJ",
+                    type: "custom",
+                    message: "CNPJ incorreto",
+                    validationFunction: function (sender, data, callback, params) {
+                        if(data !==undefined && data !==null && data != ""){
+                            callback(validarCNPJ(data));
+                        }
+                        else{
+                            callback(true);
+                        }
+                    }
+                }
+            ]
+        }
+    };
+
+    $(".ui.dropdown").dropdown({
+        onChange: function(value, text, $selectedItem) {
+            var target  = "smform";
+            $("#smform").empty();
+            if(value=='0'){
+                formData.renderer = 'default';
+            }
+            if(value=='1'){
+                formData.renderer = 'v-grid';
+            }
+            if(value=='2'){
+                var target  = "smformG";
+                formData.renderer = 'grid-row';
+                var html = '';
+                html += '<form class="ui form">';
+                html += '<table class="ui celled table">';
+                html += '    <thead>';
+                html += '        <tr>';
+                html += '            <th>Primeiro Nome</th>';
+                html += '            <th>Último Nome</th>';
+                html += '            <th>Email</th>';
+                html += '            <th>CNPJ</th>';
+                html += '        </tr>';
+                html += '    </thead>';
+                html += '    <tbody id="smformG"></tbody>';
+                html += '</table>';
+                html += '</form>';
+                $("#smform").html(html);
+            }
+            widgetInstance = ruteZangada.renderWidget("Form", target, formData);
+        }
+    });
+
+
+
+
+
+    var widgetInstance = ruteZangada.renderWidget("Form", "smform", formData);
+
+    $("#validateButton").click(function () {
+        widgetInstance.validateForm();
+    });
+
+    function validarCNPJ(cnpj) {
+        var cnpj_numbers = cnpj.replace(/[^\d]/g, '');
+        return (cnpj_numbers.length == 14 && cnpj_numbers.match(/^(\w)\1+$/g) == null) && (function (cnpj) {
+                    var size = 12;
+                    var validDigits = 0;
+                    cnpj.substring(cnpj.length - 2).split('').every(function (checkDigit, index) {
+                        size += index;
+                        var numbers = cnpj.substring(0, size);
+                        var sum = 0;
+                        var pos = size - 7;
+                        for (i = size; i >= 1; i--) {
+                            sum += numbers.charAt(size - i) * pos--;
+                            if (pos < 2) pos = 9;
+                        }
+                        var result = (sum % 11 < 2 ? 0 : 11 - sum % 11) == checkDigit;
+                        if (result) validDigits++;
+                        return result;
+                    });
+                    return validDigits == 2;
+                })(cnpj_numbers);
+    }
+</script>
+</html>

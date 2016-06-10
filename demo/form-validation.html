@@ -192,6 +192,7 @@
                 html += '            <th>Primeiro Nome</th>';
                 html += '            <th>Último Nome</th>';
                 html += '            <th>Email</th>';
+                html += '            <th>Idade</th>';
                 html += '            <th>CNPJ</th>';
                 html += '        </tr>';
                 html += '    </thead>';
@@ -205,13 +206,12 @@
     });
 
 
-
-
-
     var widgetInstance = ruteZangada.renderWidget("Form", "smform", formData);
 
     $("#validateButton").click(function () {
-        widgetInstance.validateForm();
+        widgetInstance.validateForm(function (sender,result) {
+            console.log("resultado da validação: ",result);
+        });
     });
 
     function validarCNPJ(cnpj) {

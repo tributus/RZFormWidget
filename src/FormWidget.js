@@ -71,6 +71,14 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         $this.renderer.setValueOf(fieldid, value);
     };
 
+    this.getValueOfModel = function (model) {
+         return $this.renderer.getValueOfModel(model);
+    };
+
+    this.setValueOfModel = function (model,value) {
+        return $this.renderer.setValueOfModel(model,value);
+    };
+
     this.getFormData = function () {
         return $this.renderer.getFormData();
     };

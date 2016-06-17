@@ -17,8 +17,6 @@
     <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-message/message.min.css">
 
 
-
-
     <style id="demo-only-style">
         .validation-report-container {
             margin-top: 10px;
@@ -39,7 +37,6 @@
 </head>
 <body>
 <h1>Exemplo 1</h1>
-
 
 
 <div class="ui padded grid ">
@@ -111,13 +108,15 @@
                     label: "CNPJ",
                     type: "text",
                     id: "cnpj",
-                    attributes:[
+                    attributes: [
                         {
-                            name:"placeholder",
-                            value:"ex: 08.313.481/0001-05"
+                            name: "placeholder",
+                            value: "ex: 08.313.481/0001-05"
                         }
                     ]
-                }
+                },
+                {model: "password", label: "Senha", type: "password", id: "pwd"},
+                {model: "passwordC", label: "Confirmar Senha", type: "password", id: "pwdC"}
             ]
         }
 
@@ -148,41 +147,49 @@
                 },
                 {
                     model: "Idade",
-                    type:"range",
-                    message:"A idade deve estar entre 18 e 35 anos",
-                    minValue:18,
-                    maxValue:35,
-                    valueType:"number"
+                    type: "range",
+                    message: "A idade deve estar entre 18 e 35 anos",
+                    minValue: 18,
+                    maxValue: 35,
+                    valueType: "number"
                 },
                 {
                     model: "CNPJ",
                     type: "custom",
                     message: "CNPJ incorreto",
                     validationFunction: function (sender, data, callback, params) {
-                        if(data !==undefined && data !==null && data != ""){
+                        if (data !== undefined && data !== null && data != "") {
                             callback(validarCNPJ(data));
                         }
-                        else{
+                        else {
                             callback(true);
                         }
                     }
+                },
+                {
+                    type: "compare",
+                    model: "passwordC",
+                    modelToCompare: "password",
+                    valueType: "text",
+                    operator: "==",
+                    message: "As senhas não coincidem"
                 }
             ]
         }
     };
 
     $(".ui.dropdown").dropdown({
-        onChange: function(value, text, $selectedItem) {
-            var target  = "smform";
+        onChange: function (value, text, $selectedItem) {
+            var target = "smform";
             $("#smform").empty();
-            if(value=='0'){
+            if (value == '0') {
                 formData.renderer = 'default';
             }
-            if(value=='1'){
+            if (value == '1') {
                 formData.renderer = 'v-grid';
             }
-            if(value=='2'){
-                var target  = "smformG";
+            if (value == '2') {
+                var target = "smformG";
                 formData.renderer = 'grid-row';
                 var html = '';
                 html += '<form class="ui form">';
@@ -209,8 +216,8 @@
     var widgetInstance = ruteZangada.renderWidget("Form", "smform", formData);
 
     $("#validateButton").click(function () {
-        widgetInstance.validateForm(function (sender,result) {
-            console.log("resultado da validação: ",result);
+        widgetInstance.validateForm(function (sender, result) {
+            console.log("resultado da validação: ", result);
         });
     });
 

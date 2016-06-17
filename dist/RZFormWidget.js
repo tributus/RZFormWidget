@@ -23,6 +23,8 @@ rz.widgets.RZFormWidgetHelpers = {
         "getValueOf",
         "setValueAt",
         "setValueOf",
+        "setValueOfModel",
+        "getValueOfModel",
         "getFormData",
         "clearFormData",
         "validateForm",
@@ -488,6 +490,16 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         return rz.widgets.formHelpers.getValueOfField("#" + fieldid);
     };
 
+    this.getValueOfModel = function (model) {
+        var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
+        return $this.renderer.getValueOf(id);
+    };
+
+    this.setValueOfModel = function (model,value) {
+        var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
+        return $this.renderer.setValueOf(id,value);
+    };
+
     this.setValueAt = function (position, value) {
         var p = position;
         if (p >= 0 && p < this.fieldCount()) {
@@ -556,47 +568,10 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
      * @param {function } validationResultHandler - method invoked after validation
      */
     this.validateForm = function(validationResultHandler){
-        // var formData = $this.sender.getFormData();
-        // //ao final: if(validationResultHandler !==undefined) validationResultHandler(sender,{result:false, errors:[...]})
-        // if(params.validation.enabled){
-        //     $this.sender.validationReport = [];
-        //     params.validation.rules.forEach(function (rule) {
-        //         rz.widgets.formHelpers.validateField(rule.type,$this.sender,formData[rule.model] ,rule,function(result,params){
-        //             if(!result){
-        //                 $this.sender.validationReport.push({failedRule:rule});
-        //             }
-        //         });
-        //     });
-        //     $this.sender.isFormInvalid  = $this.sender.validationReport.length > 0;
-        //     $this.displayValidationReport();
-        //     validationResultHandler($this.sender,{isValid:$this.sender.isFormInvalid});
-        // }
-        // else{
-        //     validationResultHandler($this.sender,{isValid:true});
-        // }
         rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler);
     };
 
     this.displayValidationReport = function(){
-        // var fieldsSelector = '#* .field'.replace('*',$this.target);
-        // $(fieldsSelector).removeClass("error");
-        // var fieldSelector = '#* [data-model="*"]'.replace('*',$this.target);
-        // var reportTarget = $this.params.validation.reportTarget || "#" + $this.target + "_validation_report";
-        // if($this.sender.validationReport !==undefined && $this.sender.validationReport.length > 0){
-        //     var sb = new StringBuilder();
-        //     sb.appendFormat('<div class="ui error message">');
-        //     sb.appendFormat('	<ul class="list">');
-        //     $this.sender.validationReport.forEach(function(item){
-        //         sb.appendFormat('<li>{0}</li>', item.failedRule.message);
-        //         $(fieldSelector.replace('*',item.failedRule.model)).addClass("error");
-        //     });
-        //     sb.appendFormat('	</ul>');
-        //     sb.appendFormat('</div>');
-        //     $(reportTarget).html(sb.toString());
-        // }
-        // else{
-        //     $(reportTarget).empty();
-        // }
         rz.widgets.formHelpers.displayValidationReportImpl($this);
     };
 
@@ -696,6 +671,16 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         }
     };
 
+    this.getValueOfModel = function (model) {
+        var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
+        return $this.renderer.getValueOf(id);
+    };
+
+    this.setValueOfModel = function (model,value) {
+        var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
+        return $this.renderer.setValueOf(id,value);
+    };
+
     this.getValueOf = function (fieldid) {
         if (!fieldid.startsWith($this.target + "_")) {
             fieldid = $this.target + "_" + fieldid;
@@ -767,47 +752,10 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
      * @param {function } validationResultHandler - method invoked after validation
      */
     this.validateForm = function(validationResultHandler){
-        // var formData = $this.sender.getFormData();
-        // //ao final: if(validationResultHandler !==undefined) validationResultHandler(sender,{result:false, errors:[...]})
-        // if(params.validation.enabled){
-        //     $this.sender.validationReport = [];
-        //     params.validation.rules.forEach(function (rule) {
-        //         rz.widgets.formHelpers.validateField(rule.type,$this.sender,formData[rule.model] ,rule,function(result,params){
-        //             if(!result){
-        //                 $this.sender.validationReport.push({failedRule:rule});
-        //             }
-        //         });
-        //     });
-        //     $this.sender.isFormInvalid  = $this.sender.validationReport.length > 0;
-        //     $this.displayValidationReport();
-        //     validationResultHandler($this.sender,{isValid:$this.sender.isFormInvalid});
-        // }
-        // else{
-        //     validationResultHandler($this.sender,{isValid:true});
-        // }
         rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler);
     };
 
     this.displayValidationReport = function(){
-        // var fieldsSelector = '#* .field'.replace('*',$this.target);
-        // $(fieldsSelector).removeClass("error");
-        // var fieldSelector = '#* [data-model="*"]'.replace('*',$this.target);
-        // var reportTarget = $this.params.validation.reportTarget || "#" + $this.target + "_validation_report";
-        // if($this.sender.validationReport !==undefined && $this.sender.validationReport.length > 0){
-        //     var sb = new StringBuilder();
-        //     sb.appendFormat('<div class="ui error message">');
-        //     sb.appendFormat('	<ul class="list">');
-        //     $this.sender.validationReport.forEach(function(item){
-        //         sb.appendFormat('<li>{0}</li>', item.failedRule.message);
-        //         $(fieldSelector.replace('*',item.failedRule.model)).addClass("error");
-        //     });
-        //     sb.appendFormat('	</ul>');
-        //     sb.appendFormat('</div>');
-        //     $(reportTarget).html(sb.toString());
-        // }
-        // else{
-        //     $(reportTarget).empty();
-        // }
         rz.widgets.formHelpers.displayValidationReportImpl($this);
     };
     
@@ -975,6 +923,16 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         }
     };
 
+    this.getValueOfModel = function (model) {
+        var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
+        return $this.renderer.getValueOf(id);
+    };
+
+    this.setValueOfModel = function (model,value) {
+        var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
+        return $this.renderer.setValueOf(id,value);
+    };
+
     this.getValueOf = function (fieldid) {
         if (!fieldid.startsWith($this.target + "_")) {
             fieldid = $this.target + "_" + fieldid;
@@ -1042,51 +1000,55 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     };
 
     this.validateForm = function(validationResultHandler){
-        // var formData = $this.sender.getFormData();
-        // if(params.validation.enabled){
-        //     $this.sender.validationReport = [];
-        //     params.validation.rules.forEach(function (rule) {
-        //         rz.widgets.formHelpers.validateField(rule.type,$this.sender,formData[rule.model] ,rule,function(result,params){
-        //             if(!result){
-        //                 $this.sender.validationReport.push({failedRule:rule});
-        //             }
-        //         });
-        //     });
-        //     $this.sender.isFormInvalid  = $this.sender.validationReport.length > 0;
-        //     $this.displayValidationReport();
-        //     validationResultHandler($this.sender,{isValid:$this.sender.isFormInvalid});            
-        // }
-        // else{
-        //     validationResultHandler($this.sender,{isValid:true});
-        // }
         rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler);
     };
 
     this.displayValidationReport = function(){
-        // var fieldsSelector = '#* .field'.replace('*',$this.target);
-        // $(fieldsSelector).removeClass("error");
-        // var fieldSelector = '#* [data-model="*"]'.replace('*',$this.target);
-        // var reportTarget = $this.params.validation.reportTarget || "#" + $this.target + "_validation_report";
-        // if($this.sender.validationReport !==undefined && $this.sender.validationReport.length > 0){
-        //     var sb = new StringBuilder();
-        //     sb.appendFormat('<div class="ui error message">');
-        //     sb.appendFormat('	<ul class="list">');
-        //     $this.sender.validationReport.forEach(function(item){
-        //         sb.appendFormat('<li>{0}</li>', item.failedRule.message);
-        //         $(fieldSelector.replace('*',item.failedRule.model)).addClass("error");
-        //     });
-        //     sb.appendFormat('	</ul>');
-        //     sb.appendFormat('</div>');
-        //     $(reportTarget).html(sb.toString());
-        // }
-        // else{
-        //     $(reportTarget).empty();
-        // }
         rz.widgets.formHelpers.displayValidationReportImpl($this);
     };
 
     initialize();
 };
+/**
+ * Created by anderson.santos on 17/06/2016.
+ *
+ * Parâmetros:
+ * {
+ *    type:"compare",
+ *    model: "password",
+ *    modelToCompare:"passwordConfirm",
+ *    valueType:"text",
+ *    operator:"==",
+ *    message:"message"
+ * }
+ */
+rz.widgets.formHelpers.createFormValidator("compare",function(sender,value,validationParams,validationHandler){
+    var resolveType = function(v,tp){
+        if(v===undefined || v==null) return v;
+        switch (tp){
+            case "number": return parseFloat(v);
+            case "date":return new Date(v);
+            case "text":return v.toString();
+            default: return v;
+        }
+    };
+    var callback = rz.helpers.ensureFunction(validationHandler);
+    var operations = {};
+    var op = validationParams.operator || "==";
+    var tp = validationParams.valueType || "text";
+    var vA = resolveType(value,tp);
+    var vB = resolveType(sender.getValueOfModel(validationParams.modelToCompare),tp);
+
+    operations["=="] = function (a, b) {return a==b};
+    operations["==="] = function (a, b) {return a===b};
+    operations["!="] = function (a, b) {return a!=b};
+    operations["!=="] = function (a, b) {return a!==b};
+    operations[">"] = function (a, b) {return a>b};
+    operations[">="] = function (a, b) {return a>=b};
+    operations["<"] = function (a, b) {return a<b};
+    operations["<="] = function (a, b) {return a<=b};
+    callback(operations[op](vA,vB));
+});
 /**
  * Created by anderson.santos on 09/06/2016.
  */
@@ -1227,6 +1189,14 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
 
     this.setValueOf = function (fieldid, value) {
         $this.renderer.setValueOf(fieldid, value);
+    };
+
+    this.getValueOfModel = function (model) {
+         return $this.renderer.getValueOfModel(model);
+    };
+
+    this.setValueOfModel = function (model,value) {
+        return $this.renderer.setValueOfModel(model,value);
     };
 
     this.getFormData = function () {

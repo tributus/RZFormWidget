@@ -1,8 +1,7 @@
 /**
- * Created by Anderson on 13/01/2016.
- * Input text renderer
+ * Created by anderson.santos on 17/06/2016.
  */
-rz.widgets.formHelpers.createFieldRenderer("text", {
+rz.widgets.formHelpers.createFieldRenderer("password", {
     render: function (sb, field, containerID) {
         var resolveAttributes = function(){
             var attr = field.attributes;
@@ -17,8 +16,8 @@ rz.widgets.formHelpers.createFieldRenderer("text", {
                 return ret;
             }
         };
-        sb.appendFormat('<input id="{1}" name="{1}" type="text" value="{0}" class="form-control"{2}>', field.value || "", containerID,resolveAttributes());
-        return containerID + "_input";
+        sb.appendFormat('<input id="{1}" name="{1}" type="password" value="{0}" class="form-control"{2}>', field.value || "", containerID,resolveAttributes());
+        return containerID + "_input_pwd";
     },
     getValue: function (id) {
         return $(id).val();

@@ -9,7 +9,6 @@ rz.widgets.formHelpers.createFieldRenderer("list", {
             sb.appendFormat('   <option value="{1}" {2}>{0}</option>', it.label, it.value, (it.value == field.value) ? "selected" : "");
         });
         sb.appendFormat('</select>');
-
     },
     getValue: function (id) {
         return $(id).val();

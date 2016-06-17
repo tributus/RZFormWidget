@@ -144,7 +144,8 @@
                                 {name:"data-foo", value:"ba"}
                             ]
                         },
-                        {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""}
+                        {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""},
+                        {model: "Senha", label: "Senha", type: "password", id: "r12", initialValue: ""}
                     ]
                 }
                     //, outros fields
@@ -247,7 +248,7 @@
     });
 
     $("#btn16").click(function () {
-        widgetInstance.removeFieldAt(5);
+        widgetInstance.removeFieldAt(0);
     });
 
     $("#btn17").click(function () {
@@ -255,7 +256,7 @@
     });
 
     $("#btn18").click(function () {
-        alert(widgetInstance.getValueAt(5));
+        alert(widgetInstance.getValueAt(0));
     });
 
     $("#btn19").click(function () {
@@ -263,7 +264,7 @@
     });
 
     $("#btn110").click(function () {
-        widgetInstance.setValueAt(5, 'ffff');
+        widgetInstance.setValueAt(0, 'ffff');
     });
 
     $("#btn111").click(function () {

@@ -183,7 +183,6 @@ rz.widgets.formHelpers.createFieldRenderer("list", {
             sb.appendFormat('   <option value="{1}" {2}>{0}</option>', it.label, it.value, (it.value == field.value) ? "selected" : "");
         });
         sb.appendFormat('</select>');
-
     },
     getValue: function (id) {
         return $(id).val();
@@ -198,6 +197,41 @@ rz.widgets.formHelpers.createFieldRenderer("list", {
     },
     doPosRenderActions: function (id) {
     }
+});
+/**
+ * Created by anderson.santos on 17/06/2016.
+ */
+rz.widgets.formHelpers.createFieldRenderer("password", {
+    render: function (sb, field, containerID) {
+        var resolveAttributes = function(){
+            var attr = field.attributes;
+            if(attr===undefined || attr.length <= 0){
+                return "";
+            }
+            else{
+                var ret = " ";
+                attr.forEach(function(at){
+                    ret += at.name + '="' + at.value + '" ';
+                });
+                return ret;
+            }
+        };
+        sb.appendFormat('<input id="{1}" name="{1}" type="password" value="{0}" class="form-control"{2}>', field.value || "", containerID,resolveAttributes());
+        return containerID + "_input_pwd";
+    },
+    getValue: function (id) {
+        return $(id).val();
+    },
+    setValue: function (id, newValue) {
+        $(id).val(newValue || "");
+    },
+    bindEvents: function (id, emit, sender) {
+        $("#" + id).change(function (e) {
+            emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
+        });
+    },
+    doPosRenderActions: function (id, $this) {}
+
 });
 /**
  * Created by Anderson on 13/01/2016.
@@ -219,7 +253,7 @@ rz.widgets.formHelpers.createFieldRenderer("text", {
             }
         };
         sb.appendFormat('<input id="{1}" name="{1}" type="text" value="{0}" class="form-control"{2}>', field.value || "", containerID,resolveAttributes());
-        return "containerID" + "_input";
+        return containerID + "_input";
     },
     getValue: function (id) {
         return $(id).val();

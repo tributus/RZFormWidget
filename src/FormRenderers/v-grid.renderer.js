@@ -162,12 +162,12 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
 
     this.getValueOfModel = function (model) {
         var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
-        return $this.renderer.getValueOf(id);
+        return $this.getValueOf(id);
     };
 
     this.setValueOfModel = function (model,value) {
         var id = $("#" + $this.baseID +  " .field[data-model='"+model+"']").attr("id");
-        return $this.renderer.setValueOf(id,value);
+        return $this.setValueOf(id,value);
     };
 
     this.getValueOf = function (fieldid) {

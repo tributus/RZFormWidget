@@ -26,6 +26,7 @@ rz.widgets.RZFormWidgetHelpers = {
         "setValueOfModel",
         "getValueOfModel",
         "getFormData",
+        "setFormData",
         "clearFormData",
         "validateForm",
         "validateFieldAt",
@@ -548,6 +549,15 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             addData(model, $this.getValueOf(id));
         }
         return root;
+    };
+
+    this.setFormData = function(formData){
+        var rcount = $this.fieldCount();
+        for (var i = 0; i < rcount; i++) {
+            var id = $this.getFieldIdAt(i);
+            var model = $("#" + id).data("model");
+            console.log("MODELFOUND:" , model);
+        }
     };
 
     this.clearFormData = function () {
@@ -1201,6 +1211,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
 
     this.getFormData = function () {
         return $this.renderer.getFormData();
+    };
+    
+    this.setFormData = function(formData){
+        $this.renderer.setFormData(formData);
     };
 
     this.clearFormData = function () {

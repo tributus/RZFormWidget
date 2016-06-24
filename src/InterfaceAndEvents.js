@@ -21,6 +21,7 @@ rz.widgets.RZFormWidgetHelpers = {
         "setValueOfModel",
         "getValueOfModel",
         "getFormData",
+        "setFormData",
         "clearFormData",
         "validateForm",
         "validateFieldAt",

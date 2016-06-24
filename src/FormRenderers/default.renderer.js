@@ -277,6 +277,15 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         return root;
     };
 
+    this.setFormData = function(formData){
+        var rcount = $this.fieldCount();
+        for (var i = 0; i < rcount; i++) {
+            var id = $this.getFieldIdAt(i);
+            var model = $("#" + id).data("model");
+            console.log("MODELFOUND:" , model);
+        }
+    };
+
     this.clearFormData = function () {
         var rcount = $this.fieldCount();
         for (var i = 0; i < rcount; i++) {

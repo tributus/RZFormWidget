@@ -82,6 +82,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
     this.getFormData = function () {
         return $this.renderer.getFormData();
     };
+    
+    this.setFormData = function(formData){
+        $this.renderer.setFormData(formData);
+    };
 
     this.clearFormData = function () {
         $this.renderer.clearFormData();

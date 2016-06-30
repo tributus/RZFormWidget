@@ -117,7 +117,12 @@
                     ]
                 },
                 {model: "pessoa.security.user.password", label: "Senha", type: "password", id: "pwd"},
-                {model: "pessoa.security.user.passwordConfirmation", label: "Confirmar Senha", type: "password", id: "pwdC"}
+                {
+                    model: "pessoa.security.user.passwordConfirmation",
+                    label: "Confirmar Senha",
+                    type: "password",
+                    id: "pwdC"
+                }
             ]
         }
 
@@ -202,6 +207,8 @@
                 html += '            <th>Email</th>';
                 html += '            <th>Idade</th>';
                 html += '            <th>CNPJ</th>';
+                html += '            <th>Senha</th>';
+                html += '            <th>Confirmação Senha</th>';
                 html += '        </tr>';
                 html += '    </thead>';
                 html += '    <tbody id="smformG"></tbody>';
@@ -218,25 +225,25 @@
 
     $("#getDataButton").click(function () {
         var data = widgetInstance.getFormData();
-        console.log("FormData:",data);
+        console.log("FormData:", data);
     });
 
     $("#setDataButton").click(function () {
         var data = {
-            pessoa:{
-                PrimeiroNome:"Anderson",
-                UltimoNome:"Santos",
-                endereco:{
-                    Email:"anderson.santos@pcinformatica.com.br"
+            pessoa: {
+                PrimeiroNome: "Anderson",
+                UltimoNome: "Santos",
+                endereco: {
+                    Email: "anderson.santos@pcinformatica.com.br"
                 },
-                Idade:37,
-                documentos:{
-                    CNPJ:"1.234.567/0001-00"
+                Idade: 37,
+                documentos: {
+                    CNPJ: "1.234.567/0001-00"
                 },
-                security:{
-                    user:{
-                        password:"123",
-                        passwordConfirmation:"123"
+                security: {
+                    user: {
+                        password: "123",
+                        passwordConfirmation: "123"
                     }
                 }
             }
@@ -244,100 +251,8 @@
         widgetInstance.setFormData(data);
     });
 
-    var dt = {};
-
-//    var setDataAtPath = function(obj,path,value){
-//        /*
-//        * a
-//        * a.b
-//        * a.b.c
-//        * a[0]
-//        * a[0].b
-//        * a[0].b.c.d.e.f
-//        * a.b.c[0].d.e[4].f
-//        *
-//        */
-//
-//        var collectionPattern = /\[[0-9]+]$/;
-//        var parts = path.split(".");
-//        var last = obj;
-//
-//        parts.forEach(function (part, ix) {
-//            var isCollection = part.match(collectionPattern) !=null;
-//            var collectionIndex = (isCollection)? parseInt(part.replace(/\D/g,'')) :undefined;
-//
-//            var it = (isCollection) ? part.replace(collectionPattern,"") : part;
-//            if ((ix == parts.length - 1)) {
-//                if(isCollection){
-//                    if(last[it]===undefined){
-//                        last[it]=[];
-//                    }
-//                    last[it][collectionIndex] = value;
-//                }
-//                else{
-//                    last[it] = value;
-//                }
-//            }
-//            else {
-//                if (last[it] === undefined) {
-//                    if(isCollection){
-//                        if(last[it]===undefined){
-//                            last[it]=[];
-//                            last[it][collectionIndex] = {};
-//                        }
-//                        //last[it][collectionIndex] = {};
-//                    }
-//                    else{
-//                        last[it] = {};
-//                    }
-//
-//                }
-//            }
-//            last = last[it];
-//        });
-//    }
-
-    var setD = function(obj,path,value){
-        //a.b.c=1;
-        //parsePath();
-        var parts = path.split('.');
-        var lastIndex = parts.length -1;
-        var pointer = obj;
-        var setDR = function(index){
-            if(index==lastIndex){
-                pointer[parts] = value;
-            }
-        };
-
-        setDR(0);
-    };
-
-    var parseJSONExpression = function(expression){
-        var variablePattern = /^([a-zA-Z_$ºª]+([0-9]+)?)+$/;                                //xpto,_ddd,a123,_1,$
-        var collectionPattern = /^(([a-zA-Z_$ºª]+([0-9]+)?)+)\[[0-9]+]$/;                   //xpto[0],_ddd[123],a123[9],_1[7],$[7]
-
-        var objNamePattern = /^(([a-zA-Z_$ºª]+([0-9]+)?)+)(\[".+"]|\[""]|\['']|\['.+'])$/;  //xpto["0"],_ddd["123"],a123["9asd asd as"],_1["##$#$#"],$['7'];
 
 
-        /*
-         a[0]
-         a[0012121]
-         a['0']
-         a["X"]["y"]["z"][9]["q"]
-         a[0]["y"]["z"][9]["q"]
-         a[3330003221]["ss"]
-         a['001321321321']['ss']['']
-         a["x"]["xvc dfg dfg dgdf gfg fd"]["a"]['a']
-         a["x"]["xvc dfg dfg dgdf gfg fd"]["a"]['a']
-         a[""][""][2][0]['0']["0"][0]
-         */
-        var supercomplexPattern = /^(([a-zA-Z_$ºª]+([0-9]+)?)+)(\[[0-9]+]|\[".+"]|\[""]|\['']|\['.+'])+$/;
-        var parts = expression.split(".");
-        var col = [];
-        parts.forEach(function(item){
-
-        });
-    };
 
 </script>
 </html>

@@ -19,7 +19,7 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         var sb = new StringBuilder();
         sb.append('<div class="grid-form">');
         sb.append('<form class="ui form">');
-        sb.appendFormat('  <table id="{0}base_table" class="ui celled table">', target);
+        sb.appendFormat('  <table id="{0}base_form" class="ui celled table">', target);
         renderHeader(sb, params);
         sb.append('    <tbody>');
         rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
@@ -115,33 +115,33 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     };
 
     this.fieldCount = function () {
-        return $("#" + $this.target + "base_table tbody > .field-row").length;
+        return $("#" + $this.target + "base_form tbody > .field-row").length;
     };
 
     this.getFieldIdAt = function (position) {
         var p = position;
         if (p >= 0 && p < $this.sender.fieldCount()) {
-            return $("#" + $this.target + "base_table tbody > .field-row").eq(p).attr("id");
+            return $("#" + $this.target + "base_form tbody > .field-row").eq(p).attr("id");
         }
     };
 
     this.addField = function (fielddata) {
         var sb = new StringBuilder();
         renderDataField(sb, fielddata);
-        $(sb.toString()).appendTo("#" + $this.target + "base_table tbody");
+        $(sb.toString()).appendTo("#" + $this.target + "base_form tbody");
 
     };
 
     this.insertField = function (fielddata, position) {
         var sb = new StringBuilder();
         renderDataField(sb, fielddata);
-        $("#" + $this.target + "base_table tbody > .field-row").eq(position).before(sb.toString());
+        $("#" + $this.target + "base_form tbody > .field-row").eq(position).before(sb.toString());
     };
 
     this.removeFieldAt = function (position) {
         var p = position;
         if (p >= 0 && p < this.fieldCount()) {
-            $("#" + $this.target + "base_table tbody > .field-row").eq(p).remove();
+            $("#" + $this.target + "base_form tbody > .field-row").eq(p).remove();
         }
     };
 
@@ -155,7 +155,7 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     this.getValueAt = function (position) {
         var p = position;
         if (p >= 0 && p < this.fieldCount()) {
-            var id = $("#" + $this.target + "base_table tbody > .field-row").eq(p).attr("id");
+            var id = $("#" + $this.target + "base_form tbody > .field-row").eq(p).attr("id");
             return rz.widgets.formHelpers.getValueOfField("#" + id);
         }
     };
@@ -180,7 +180,7 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     this.setValueAt = function (position, value) {
         var p = position;
         if (p >= 0 && p < this.fieldCount()) {
-            var id = $("#" + $this.target + "base_table tbody > .field-row").eq(p).attr("id");
+            var id = $("#" + $this.target + "base_form tbody > .field-row").eq(p).attr("id");
             rz.widgets.formHelpers.setValueOfField("#" + id, value);
             rz.widgets.formHelpers.emit("data-changed", {fieldid: id, value: value, src: "code"}, $this.sender);
         }
@@ -195,32 +195,11 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     };
 
     this.getFormData = function () {
-        var root = {};
-        var rcount = $this.fieldCount();
+        return rz.widgets.formHelpers.getFormDataImpl($this);
+    };
 
-        function addData(obj, value) {
-            //var root = {};
-            var parts = obj.split(".");
-            var last = root;
-            parts.forEach(function (it, ix) {
-                if ((ix == parts.length - 1)) {
-                    last[it] = value;
-                }
-                else {
-                    if (last[it] === undefined) {
-                        last[it] = {};
-                    }
-                }
-                last = last[it];
-            });
-        }
-
-        for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
-            var model = $("#" + id).data("model");
-            addData(model, $this.getValueOf(id));
-        }
-        return root;
+    this.setFormData = function(formData){
+        rz.widgets.formHelpers.setFormDataImpl(formData,$this);
     };
 
     this.clearFormData = function () {

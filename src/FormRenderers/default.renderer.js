@@ -251,39 +251,11 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     this.getFormData = function () {
-        var root = {};
-        var rcount = $this.fieldCount();
-
-        function addData(obj, value) {
-            var parts = obj.split(".");
-            var last = root;
-            parts.forEach(function (it, ix) {
-                if ((ix == parts.length - 1)) {
-                    last[it] = value;
-                }
-                else {
-                    if (last[it] === undefined) {
-                        last[it] = {};
-                    }
-                }
-                last = last[it];
-            });
-        }
-        for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
-            var model = $("#" + id).data("model");
-            addData(model, $this.getValueOf(id));
-        }
-        return root;
+        return rz.widgets.formHelpers.getFormDataImpl($this);
     };
 
     this.setFormData = function(formData){
-        var rcount = $this.fieldCount();
-        for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
-            var model = $("#" + id).data("model");
-            console.log("MODELFOUND:" , model);
-        }
+        rz.widgets.formHelpers.setFormDataImpl(formData,$this);
     };
 
     this.clearFormData = function () {

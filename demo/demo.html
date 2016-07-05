@@ -13,11 +13,15 @@
     <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-accordion/accordion.min.css">
     <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-menu/menu.min.css">
     <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-segment/segment.min.css">
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-transition/transition.min.css"> <!--requerido apenas pelo dropdown-->
+    <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-dropdown/dropdown.min.css">
 
     <script src="../bower_components/RZClientEngine/dist/RZClientEngine-standalone.min.js"></script>
     <script src="../bower_components/semantic-ui-form/form.min.js"></script>
     <script src="../bower_components/semantic-ui-tab/tab.min.js"></script>
     <script src="../bower_components/semantic-ui-accordion/accordion.min.js"></script>
+    <script src="../bower_components/semantic-ui-transition/transition.min.js"></script> <!--requerido apenas pelo dropdown-->
+    <script src="../bower_components/semantic-ui-dropdown/dropdown.min.js"></script> <!--requerido apenas pelo renderizador lista-->
     <script src="../dist/RZFormWidget.js"></script>
 </head>
 <body>
@@ -156,7 +160,7 @@
             groupLabel: "Outras informações",
             fields: [
                 {
-                    model: "form.f3", label: "Field 2", value: "1", type: "list", listItems: [
+                    model: "form.f3", label: "Field 2",type: "list", listItems: [
                     {label: "lItem 1", value: 0},
                     {label: "lItem 2", value: 1},
                     {label: "lItem 3", value: 2}

@@ -79,23 +79,24 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         return $this.renderer.setValueOfModel(model,value);
     };
 
-    this.getFormData = function () {
-        return $this.renderer.getFormData();
+    this.getFormData = function (fieldsetRule) {
+        return $this.renderer.getFormData(fieldsetRule);
     };
     
-    this.setFormData = function(formData){
-        $this.renderer.setFormData(formData);
+    this.setFormData = function(formData,fieldsetRule){
+        $this.renderer.setFormData(formData,fieldsetRule);
     };
 
-    this.clearFormData = function () {
-        $this.renderer.clearFormData();
+    this.clearFormData = function (fieldsetRule) {
+        $this.renderer.clearFormData(fieldsetRule);
     };
 
     /**
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
+     * @fieldsetRule {object} optional - fieldset rules
      */
-    this.validateForm = function(validationResultHandler){
-        $this.renderer.validateForm(validationResultHandler)
+    this.validateForm = function(validationResultHandler,fieldsetRule){
+        $this.renderer.validateForm(validationResultHandler,fieldsetRule)
     }
 });

@@ -137,13 +137,14 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}{6}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
                 (h)? "inline fields":"field",
-                (field.wide !==undefined)? " " + field.wide + " wide":""
+                (field.wide !==undefined)? " " + field.wide + " wide":"",
+                rz.widgets.formHelpers.resolveFieldSet(field)
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             if(h) sb.appendFormat('<div class="sixteen wide field">');
@@ -250,33 +251,24 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
     };
 
-    this.getFormData = function () {
-        return rz.widgets.formHelpers.getFormDataImpl($this);
+    this.getFormData = function (fieldsetRule) {
+        return rz.widgets.formHelpers.getFormDataImpl($this,fieldsetRule);
     };
 
-    this.setFormData = function(formData){
-        rz.widgets.formHelpers.setFormDataImpl(formData,$this);
+    this.setFormData = function(formData,fieldsetRule){
+        rz.widgets.formHelpers.setFormDataImpl(formData,$this,fieldsetRule);
     };
 
-    this.clearFormData = function () {
-        var rcount = $this.fieldCount();
-        for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
-            var initialValue = $("#" + id).data("initial-value");
-            if (initialValue !== undefined && initialValue.toString().match(/^object-data:\[.*]$/) != null) {
-                initialValue = initialValue.replace(/^object-data:\[/, "").replace(/]$/, "");
-                initialValue = JSON.parse(atob(initialValue));
-            }
-            $this.setValueAt(i, initialValue);
-        }
+    this.clearFormData = function (fieldsetRule) {
+        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule);
     };
 
     /**
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
      */
-    this.validateForm = function(validationResultHandler){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler);
+    this.validateForm = function(validationResultHandler,fieldsetRule){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
     };
 
     this.displayValidationReport = function(){

@@ -80,18 +80,22 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    validateFormImpl: function ($this, params, validationResultHandler) {
+    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule) {
         validationResultHandler = rz.helpers.ensureFunction(validationResultHandler);
         var formData = $this.sender.getFormData();
-        //ao final: if(validationResultHandler !==undefined) validationResultHandler(sender,{result:false, errors:[...]})
+        var $that = this;
+
         if (params.validation.enabled) {
             $this.sender.validationReport = [];
             params.validation.rules.forEach(function (rule) {
-                rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
-                    if (!result) {
-                        $this.sender.validationReport.push({failedRule: rule});
-                    }
-                });
+                var fieldID = $("#" + $this.target +  "base_form .field[data-model='"+rule.model+"']").attr("id");
+                if((fieldsetRule!==undefined && $that.fieldMatchFieldSetRule(fieldID,fieldsetRule)) || fieldsetRule===undefined){
+                    rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
+                        if (!result) {
+                            $this.sender.validationReport.push({failedRule: rule});
+                        }
+                    });
+                }
             });
             $this.sender.isFormInvalid = $this.sender.validationReport.length > 0;
             $this.displayValidationReport();
@@ -122,24 +126,100 @@ rz.widgets.formHelpers = {
             $(reportTarget).empty();
         }
     },
-    getFormDataImpl: function ($this) {
+    getFormDataImpl: function ($this,fieldsetRule) {
         var root = {};
         var rcount = $this.fieldCount();
         for (var i = 0; i < rcount; i++) {
             var id = $this.getFieldIdAt(i);
             var model = $("#" + id).data("model");
-            rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model)
+            if(fieldsetRule!==undefined){
+                if(this.fieldMatchFieldSetRule(id,fieldsetRule)){
+                    rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
+                }
+            }
+            else{
+                rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
+            }
+
         }
         return root;
     },
-    setFormDataImpl: function (formData, $this) {
+    setFormDataImpl: function (formData, $this,fieldsetRule) {
         var rcount = $this.fieldCount();
         for (var i = 0; i < rcount; i++) {
             var id = $this.getFieldIdAt(i);
-            var model = $("#" + id).data("model");
-            var value = rz.helpers.jsonUtils.getDataAtPath(formData, model);
-            $this.setValueOfModel(model, value);
+            if((fieldsetRule!==undefined && this.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
+                var model = $("#" + id).data("model");
+                var value = rz.helpers.jsonUtils.getDataAtPath(formData, model);
+                $this.setValueOfModel(model, value);
+            }
         }
+    },
+    clearFormDataImpl:function($this,fieldsetRule){
+        var rcount = $this.fieldCount();
+        for (var i = 0; i < rcount; i++) {
+            var id = $this.getFieldIdAt(i);
+            if((fieldsetRule!==undefined && this.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
+                var initialValue = $("#" + id).data("initial-value");
+                if (initialValue !== undefined && initialValue.toString().match(/^object-data:\[.*]$/) != null) {
+                    initialValue = initialValue.replace(/^object-data:\[/, "").replace(/]$/, "");
+                    initialValue = JSON.parse(atob(initialValue));
+                }
+                $this.setValueAt(i, initialValue);
+            }
+        }
+    },
+    resolveFieldSet : function(field){
+        if(field.fieldSetName !==undefined){
+            if(field.fieldSetName.match(/^[a-zA-Z 0-9]+$/)){
+                var fieldSets = field.fieldSetName.split(" ");
+                var ret = [];
+                fieldSets.forEach(function(item){
+                    if(item !==""){
+                        ret.push("-FIELDSET-" + item);
+                    }
+                });
+                if(ret.length > 0){
+                    return " FIELDSET_MEMBER " + ret.join(" ");
+                }
+                else{
+                    return "";
+                }
+
+            }
+            else{
+                throw "invalid fieldset name";
+            }
+        }
+        else{
+            return "";
+        }
+    },
+    fieldMatchFieldSetRule:function(fieldID,fieldsetRule){
+        var result = (fieldsetRule.rule=="exclude");
+        fieldsetRule.fieldsets.every(function(item){
+            var fsName = "-FIELDSET-" + item;
+            if(fieldsetRule.rule=="exclude"){
+                if($("#" + fieldID).hasClass(fsName)){
+                    result=false;
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            }
+            else if(fieldsetRule.rule=="restrict"){
+                if($("#" + fieldID).hasClass(fsName)){
+                    result=true;
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            }
+
+        });
+        return result;
     }
 
 };

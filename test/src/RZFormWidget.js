@@ -131,18 +131,22 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    validateFormImpl: function ($this, params, validationResultHandler) {
+    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule) {
         validationResultHandler = rz.helpers.ensureFunction(validationResultHandler);
         var formData = $this.sender.getFormData();
-        //ao final: if(validationResultHandler !==undefined) validationResultHandler(sender,{result:false, errors:[...]})
+        var $that = this;
+
         if (params.validation.enabled) {
             $this.sender.validationReport = [];
             params.validation.rules.forEach(function (rule) {
-                rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
-                    if (!result) {
-                        $this.sender.validationReport.push({failedRule: rule});
-                    }
-                });
+                var fieldID = $("#" + $this.target +  "base_form .field[data-model='"+rule.model+"']").attr("id");
+                if((fieldsetRule!==undefined && $that.fieldMatchFieldSetRule(fieldID,fieldsetRule)) || fieldsetRule===undefined){
+                    rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
+                        if (!result) {
+                            $this.sender.validationReport.push({failedRule: rule});
+                        }
+                    });
+                }
             });
             $this.sender.isFormInvalid = $this.sender.validationReport.length > 0;
             $this.displayValidationReport();
@@ -173,24 +177,100 @@ rz.widgets.formHelpers = {
             $(reportTarget).empty();
         }
     },
-    getFormDataImpl: function ($this) {
+    getFormDataImpl: function ($this,fieldsetRule) {
         var root = {};
         var rcount = $this.fieldCount();
         for (var i = 0; i < rcount; i++) {
             var id = $this.getFieldIdAt(i);
             var model = $("#" + id).data("model");
-            rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model)
+            if(fieldsetRule!==undefined){
+                if(this.fieldMatchFieldSetRule(id,fieldsetRule)){
+                    rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
+                }
+            }
+            else{
+                rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
+            }
+
         }
         return root;
     },
-    setFormDataImpl: function (formData, $this) {
+    setFormDataImpl: function (formData, $this,fieldsetRule) {
         var rcount = $this.fieldCount();
         for (var i = 0; i < rcount; i++) {
             var id = $this.getFieldIdAt(i);
-            var model = $("#" + id).data("model");
-            var value = rz.helpers.jsonUtils.getDataAtPath(formData, model);
-            $this.setValueOfModel(model, value);
+            if((fieldsetRule!==undefined && this.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
+                var model = $("#" + id).data("model");
+                var value = rz.helpers.jsonUtils.getDataAtPath(formData, model);
+                $this.setValueOfModel(model, value);
+            }
         }
+    },
+    clearFormDataImpl:function($this,fieldsetRule){
+        var rcount = $this.fieldCount();
+        for (var i = 0; i < rcount; i++) {
+            var id = $this.getFieldIdAt(i);
+            if((fieldsetRule!==undefined && this.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
+                var initialValue = $("#" + id).data("initial-value");
+                if (initialValue !== undefined && initialValue.toString().match(/^object-data:\[.*]$/) != null) {
+                    initialValue = initialValue.replace(/^object-data:\[/, "").replace(/]$/, "");
+                    initialValue = JSON.parse(atob(initialValue));
+                }
+                $this.setValueAt(i, initialValue);
+            }
+        }
+    },
+    resolveFieldSet : function(field){
+        if(field.fieldSetName !==undefined){
+            if(field.fieldSetName.match(/^[a-zA-Z 0-9]+$/)){
+                var fieldSets = field.fieldSetName.split(" ");
+                var ret = [];
+                fieldSets.forEach(function(item){
+                    if(item !==""){
+                        ret.push("-FIELDSET-" + item);
+                    }
+                });
+                if(ret.length > 0){
+                    return " FIELDSET_MEMBER " + ret.join(" ");
+                }
+                else{
+                    return "";
+                }
+
+            }
+            else{
+                throw "invalid fieldset name";
+            }
+        }
+        else{
+            return "";
+        }
+    },
+    fieldMatchFieldSetRule:function(fieldID,fieldsetRule){
+        var result = (fieldsetRule.rule=="exclude");
+        fieldsetRule.fieldsets.every(function(item){
+            var fsName = "-FIELDSET-" + item;
+            if(fieldsetRule.rule=="exclude"){
+                if($("#" + fieldID).hasClass(fsName)){
+                    result=false;
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            }
+            else if(fieldsetRule.rule=="restrict"){
+                if($("#" + fieldID).hasClass(fsName)){
+                    result=true;
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            }
+
+        });
+        return result;
     }
 
 };
@@ -199,6 +279,15 @@ rz.widgets.formHelpers = {
  * Simple list renderer
  */
 rz.widgets.formHelpers.createFieldRenderer("list", {
+    activeInstances:{},
+    helpers: {
+        getElementID:function(id,suffix){
+            if(suffix===undefined){
+                suffix="";
+            }
+            return suffix + id + "_list";
+        }
+    },
     render: function (sb, field, containerID) {
         sb.appendFormat('<select id="{0}" name="{0}" class="form-control">', containerID);
         field.listItems.forEach(function (it) {
@@ -210,14 +299,36 @@ rz.widgets.formHelpers.createFieldRenderer("list", {
         return $(id).val();
     },
     setValue: function (id, newValue) {
-        $(id).val(newValue);
+        if(newValue==null){
+            $(id).dropdown("restore default value");
+        }
+        else{
+            $(id).dropdown("set selected",newValue);
+        }
     },
     bindEvents: function (id, emit, sender) {
-        $("#" + id).change(function (e) {
-            emit("data-changed", {fieldid: id,value: e.target.value,src: "usr"},sender);
-        });
+        var id = this.helpers.getElementID(id,"#");
+
+        var handler = function(id,value,text){
+            emit("data-changed", {fieldid: id,value: value,src: "usr",text:text},sender);
+        };
+        this.activeInstances[id].push(handler);
     },
     doPosRenderActions: function (id) {
+        var $this = this;
+        var elID = this.helpers.getElementID(id,"#");
+        $(elID).dropdown({
+            onChange:function(value, text, $selectedItem){
+                var elInst = $this.activeInstances[elID];
+                if(elInst !==undefined && elInst.length > 0){
+                    elInst.forEach(function(item){
+                        item(elID,value,text);
+                    })
+                }
+
+            }
+        });
+        this.activeInstances[elID] = [];
     }
 });
 /**
@@ -430,13 +541,14 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}{6}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
                 (h)? "inline fields":"field",
-                (field.wide !==undefined)? " " + field.wide + " wide":""
+                (field.wide !==undefined)? " " + field.wide + " wide":"",
+                rz.widgets.formHelpers.resolveFieldSet(field)
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             if(h) sb.appendFormat('<div class="sixteen wide field">');
@@ -543,33 +655,24 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
     };
 
-    this.getFormData = function () {
-        return rz.widgets.formHelpers.getFormDataImpl($this);
+    this.getFormData = function (fieldsetRule) {
+        return rz.widgets.formHelpers.getFormDataImpl($this,fieldsetRule);
     };
 
-    this.setFormData = function(formData){
-        rz.widgets.formHelpers.setFormDataImpl(formData,$this);
+    this.setFormData = function(formData,fieldsetRule){
+        rz.widgets.formHelpers.setFormDataImpl(formData,$this,fieldsetRule);
     };
 
-    this.clearFormData = function () {
-        var rcount = $this.fieldCount();
-        for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
-            var initialValue = $("#" + id).data("initial-value");
-            if (initialValue !== undefined && initialValue.toString().match(/^object-data:\[.*]$/) != null) {
-                initialValue = initialValue.replace(/^object-data:\[/, "").replace(/]$/, "");
-                initialValue = JSON.parse(atob(initialValue));
-            }
-            $this.setValueAt(i, initialValue);
-        }
+    this.clearFormData = function (fieldsetRule) {
+        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule);
     };
 
     /**
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
      */
-    this.validateForm = function(validationResultHandler){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler);
+    this.validateForm = function(validationResultHandler,fieldsetRule){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
     };
 
     this.displayValidationReport = function(){
@@ -614,11 +717,12 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
 
-            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field field">',
+            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field field{4}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
-                rz.widgets.formHelpers.getInitialValueData(field)
+                rz.widgets.formHelpers.getInitialValueData(field),
+                rz.widgets.formHelpers.resolveFieldSet(field)
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
@@ -706,33 +810,24 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
     };
 
-    this.getFormData = function () {
-        return rz.widgets.formHelpers.getFormDataImpl($this);
+    this.getFormData = function (fieldsetRule) {
+        return rz.widgets.formHelpers.getFormDataImpl($this,fieldsetRule);
     };
     
-    this.setFormData = function(formData){
-        rz.widgets.formHelpers.setFormDataImpl(formData,$this);
+    this.setFormData = function(formData,fieldsetRule){
+        rz.widgets.formHelpers.setFormDataImpl(formData,$this,fieldsetRule);
     };
 
-    this.clearFormData = function () {
-        var rcount = $this.fieldCount();
-        for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
-            var initialValue = $("#" + id).data("initial-value");
-            if (initialValue !== undefined && initialValue.toString().match(/^object-data:\[.*]$/) != null) {
-                initialValue = initialValue.replace(/^object-data:\[/, "").replace(/]$/, "");
-                initialValue = JSON.parse(atob(initialValue));
-            }
-            $this.setValueAt(i, initialValue);
-        }
+    this.clearFormData = function (fieldsetRule) {
+        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule);
     };
 
     /**
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
      */
-    this.validateForm = function(validationResultHandler){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler);
+    this.validateForm = function(validationResultHandler,fieldsetRule){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
     };
 
     this.displayValidationReport = function(){
@@ -840,12 +935,13 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
 
-            sb.appendFormat('<tr id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" {4} class="field field-row">',
+            sb.appendFormat('<tr id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" {4} class="field field-row{5}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
-                gidata || ""
+                gidata || "",
+                rz.widgets.formHelpers.resolveFieldSet(field)
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             sb.appendFormat('<td><label for="{1}">{0}</label></td>', field.label, inputID);
@@ -937,29 +1033,20 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
     };
 
-    this.getFormData = function () {
-        return rz.widgets.formHelpers.getFormDataImpl($this);
+    this.getFormData = function (fieldsetRule) {
+        return rz.widgets.formHelpers.getFormDataImpl($this,fieldsetRule);
     };
 
-    this.setFormData = function(formData){
-        rz.widgets.formHelpers.setFormDataImpl(formData,$this);
+    this.setFormData = function(formData,fieldsetRule){
+        rz.widgets.formHelpers.setFormDataImpl(formData,$this,fieldsetRule);
     };
 
-    this.clearFormData = function () {
-        var rcount = $this.fieldCount();
-        for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
-            var initialValue = $("#" + id).data("initial-value");
-            if (initialValue !== undefined && initialValue.toString().match(/^object-data:\[.*]$/) != null) {
-                initialValue = initialValue.replace(/^object-data:\[/, "").replace(/]$/, "");
-                initialValue = JSON.parse(atob(initialValue));
-            }
-            $this.setValueAt(i, initialValue);
-        }
+    this.clearFormData = function (fieldsetRule) {
+        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule);
     };
 
-    this.validateForm = function(validationResultHandler){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler);
+    this.validateForm = function(validationResultHandler,fieldsetRule){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
     };
 
     this.displayValidationReport = function(){
@@ -1158,23 +1245,24 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         return $this.renderer.setValueOfModel(model,value);
     };
 
-    this.getFormData = function () {
-        return $this.renderer.getFormData();
+    this.getFormData = function (fieldsetRule) {
+        return $this.renderer.getFormData(fieldsetRule);
     };
     
-    this.setFormData = function(formData){
-        $this.renderer.setFormData(formData);
+    this.setFormData = function(formData,fieldsetRule){
+        $this.renderer.setFormData(formData,fieldsetRule);
     };
 
-    this.clearFormData = function () {
-        $this.renderer.clearFormData();
+    this.clearFormData = function (fieldsetRule) {
+        $this.renderer.clearFormData(fieldsetRule);
     };
 
     /**
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
+     * @fieldsetRule {object} optional - fieldset rules
      */
-    this.validateForm = function(validationResultHandler){
-        $this.renderer.validateForm(validationResultHandler)
+    this.validateForm = function(validationResultHandler,fieldsetRule){
+        $this.renderer.validateForm(validationResultHandler,fieldsetRule)
     }
 });

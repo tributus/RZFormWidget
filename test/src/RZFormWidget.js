@@ -131,7 +131,7 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule) {
+    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule,forceSuccess) {
         validationResultHandler = rz.helpers.ensureFunction(validationResultHandler);
         var formData = $this.sender.getFormData();
         var $that = this;
@@ -141,11 +141,13 @@ rz.widgets.formHelpers = {
             params.validation.rules.forEach(function (rule) {
                 var fieldID = $("#" + $this.target +  "base_form .field[data-model='"+rule.model+"']").attr("id");
                 if((fieldsetRule!==undefined && $that.fieldMatchFieldSetRule(fieldID,fieldsetRule)) || fieldsetRule===undefined){
-                    rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
-                        if (!result) {
-                            $this.sender.validationReport.push({failedRule: rule});
-                        }
-                    });
+                    if(!forceSuccess){
+                        rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
+                            if (!result) {
+                                $this.sender.validationReport.push({failedRule: rule});
+                            }
+                        });
+                    }
                 }
             });
             $this.sender.isFormInvalid = $this.sender.validationReport.length > 0;
@@ -274,6 +276,119 @@ rz.widgets.formHelpers = {
     }
 
 };
+/**
+ * Created by anderson.santos on 06/07/2016.
+ */
+rz.widgets.formHelpers.createFieldRenderer("collection", {
+    render: function (sb, field, containerID) {
+
+        sb.appendFormat('<h4 class="ui horizontal divider header">');
+        sb.appendFormat('    <button class="ui primary button">Add</button>');
+        sb.appendFormat('</h4>');
+
+        // sb.appendFormat('<div class="ui flat segment">');
+        // sb.appendFormat('<button class="ui primary button">Add</button>');
+        // sb.appendFormat('<button class="ui primary button">Clear</button>');
+        // sb.appendFormat('</div>');
+
+
+        sb.appendFormat('<div class="ui raised secondary segment">');
+        sb.appendFormat('<div class="ui middle aligned divided list">');
+
+        sb.appendFormat('  <div class="item">');
+        sb.appendFormat('    <div class="right floated content">');
+        sb.appendFormat('      <a class="ui icon primary button">');
+        sb.appendFormat('           <i class="edit icon"></i>');
+        sb.appendFormat('       </a>');
+        sb.appendFormat('      <a class="ui icon negative button">');
+        sb.appendFormat('           <i class="delete icon"></i>');
+        sb.appendFormat('       </a>');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('    <div class="content">');
+        sb.appendFormat('      Lena');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('  </div>');
+
+        sb.appendFormat('  <div class="item">');
+        sb.appendFormat('    <div class="right floated content">');
+        sb.appendFormat('      <a class="ui icon primary button">');
+        sb.appendFormat('           <i class="edit icon"></i>');
+        sb.appendFormat('       </a>');
+        sb.appendFormat('      <a class="ui icon negative button">');
+        sb.appendFormat('           <i class="delete icon"></i>');
+        sb.appendFormat('       </a>');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('    <div class="content">');
+        sb.appendFormat('      Lindsay');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('  </div>');
+
+        sb.appendFormat('  <div class="item">');
+        sb.appendFormat('    <div class="right floated content">');
+
+        sb.appendFormat('<div class="ui icon top right pointing dropdown button">');
+        sb.appendFormat('  <i class="ellipsis vertical icon"></i>');
+        sb.appendFormat('  <div class="menu">');
+        sb.appendFormat('    <div class="header">Ações</div>');
+        sb.appendFormat('    <div class="item"><i class="edit icon"></i> Editar item</div>');
+        sb.appendFormat('    <div class="item"><i class="delete icon"></i> Excluir item</div>');
+        sb.appendFormat('  </div>');
+        sb.appendFormat('</div>');
+        sb.appendFormat('<script>$(".ui.dropdown").dropdown()</script>');
+
+        sb.appendFormat('    </div>');
+        sb.appendFormat('    <div class="content">');
+        sb.appendFormat('      Lindsay');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('  </div>');
+
+        sb.appendFormat('  <div class="item">');
+        sb.appendFormat('    <div class="right floated content">');
+        sb.appendFormat('      <a class="ui button">Add</a>');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('    <div class="content">');
+        sb.appendFormat('      Lindsay');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('  </div>');
+        sb.appendFormat('  <div class="item">');
+        sb.appendFormat('    <div class="right floated content">');
+        sb.appendFormat('      <a class="ui button">Add</a>');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('    <div class="content">');
+        sb.appendFormat('      Mark');
+        sb.appendFormat('    </div>');
+        sb.appendFormat('  </div>');
+        sb.appendFormat('  <div class="item">');
+        sb.appendFormat('    <div class="right floated content">');
+        sb.appendFormat('      <div class="ui button">Add</div>');
+        sb.appendFormat('    </div>');
+        //content
+        sb.appendFormat('    <img class="ui avatar image" src="/images/avatar2/small/molly.png">');
+        sb.appendFormat('    <div class="content">');
+        sb.appendFormat('      Molly');
+        sb.appendFormat('    </div>');
+        //content
+
+        sb.appendFormat('  </div>');
+        sb.appendFormat('</div>');
+        sb.appendFormat('</div>');
+        return containerID + "_collection";
+    },
+    getValue: function (id) {
+        //return $(id).val();
+    },
+    setValue: function (id, newValue) {
+        //$(id).val(newValue || "");
+        throw "errrrrrrr";
+    },
+    bindEvents: function (id, emit, sender) {
+    //     $("#" + id).change(function (e) {
+    //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
+    //     });
+    },
+    doPosRenderActions: function (id, $this) {}
+
+});
 /**
  * Created by Anderson on 13/01/2016.
  * Simple list renderer
@@ -671,8 +786,8 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
      */
-    this.validateForm = function(validationResultHandler,fieldsetRule){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
+    this.validateForm = function(validationResultHandler,fieldsetRule,forceSuccess){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule,forceSuccess);
     };
 
     this.displayValidationReport = function(){
@@ -826,8 +941,8 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
      */
-    this.validateForm = function(validationResultHandler,fieldsetRule){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
+    this.validateForm = function(validationResultHandler,fieldsetRule,forceSuccess){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule,forceSuccess);
     };
 
     this.displayValidationReport = function(){
@@ -1045,8 +1160,8 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule);
     };
 
-    this.validateForm = function(validationResultHandler,fieldsetRule){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
+    this.validateForm = function(validationResultHandler,fieldsetRule,forceSuccess){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule,forceSuccess);
     };
 
     this.displayValidationReport = function(){
@@ -1170,6 +1285,7 @@ rz.widgets.formHelpers.createFormValidator("required",function(sender,value,vali
 rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers.FormWidgetInterface,rz.widgets.RZFormWidgetHelpers.FormWidgetEventHandlers,function () {
     var $this = this;
     this.validationReport = [];
+    $this.lastFieldsetRules = undefined;
     this.initialize = function (params, initialized) {
         var renderer = params.renderer || "default";
         $this.renderer = new rz.widgets.FormRenderers[renderer](params, $this);
@@ -1183,7 +1299,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
 
     var updateValidationStatus = function(){
         if($this.isFormInvalid){
-            $this.validateForm();
+            $this.validateForm(undefined, $this.lastFieldsetRules);
         }
     };
 
@@ -1250,10 +1366,15 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
     };
     
     this.setFormData = function(formData,fieldsetRule){
+        $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.setFormData(formData,fieldsetRule);
     };
 
-    this.clearFormData = function (fieldsetRule) {
+    this.clearFormData = function (fieldsetRule,preserveValidationStatus) {
+        if(!preserveValidationStatus){
+            $this.renderer.validateForm(undefined,undefined,true);
+        }
+        $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.clearFormData(fieldsetRule);
     };
 
@@ -1263,6 +1384,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
      * @fieldsetRule {object} optional - fieldset rules
      */
     this.validateForm = function(validationResultHandler,fieldsetRule){
+        $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.validateForm(validationResultHandler,fieldsetRule)
     }
 });

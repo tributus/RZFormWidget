@@ -143,8 +143,8 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
      * validates de form data
      * @param {function } validationResultHandler - method invoked after validation
      */
-    this.validateForm = function(validationResultHandler,fieldsetRule){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
+    this.validateForm = function(validationResultHandler,fieldsetRule,forceSuccess){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule,forceSuccess);
     };
 
     this.displayValidationReport = function(){

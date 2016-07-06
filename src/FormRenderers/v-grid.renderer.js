@@ -207,8 +207,8 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule);
     };
 
-    this.validateForm = function(validationResultHandler,fieldsetRule){
-        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule);
+    this.validateForm = function(validationResultHandler,fieldsetRule,forceSuccess){
+        rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule,forceSuccess);
     };
 
     this.displayValidationReport = function(){

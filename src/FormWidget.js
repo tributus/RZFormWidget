@@ -4,6 +4,7 @@
 rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers.FormWidgetInterface,rz.widgets.RZFormWidgetHelpers.FormWidgetEventHandlers,function () {
     var $this = this;
     this.validationReport = [];
+    $this.lastFieldsetRules = undefined;
     this.initialize = function (params, initialized) {
         var renderer = params.renderer || "default";
         $this.renderer = new rz.widgets.FormRenderers[renderer](params, $this);
@@ -17,7 +18,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
 
     var updateValidationStatus = function(){
         if($this.isFormInvalid){
-            $this.validateForm();
+            $this.validateForm(undefined, $this.lastFieldsetRules);
         }
     };
 
@@ -84,10 +85,15 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
     };
     
     this.setFormData = function(formData,fieldsetRule){
+        $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.setFormData(formData,fieldsetRule);
     };
 
-    this.clearFormData = function (fieldsetRule) {
+    this.clearFormData = function (fieldsetRule,preserveValidationStatus) {
+        if(!preserveValidationStatus){
+            $this.renderer.validateForm(undefined,undefined,true);
+        }
+        $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.clearFormData(fieldsetRule);
     };
 
@@ -97,6 +103,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
      * @fieldsetRule {object} optional - fieldset rules
      */
     this.validateForm = function(validationResultHandler,fieldsetRule){
+        $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.validateForm(validationResultHandler,fieldsetRule)
     }
 });

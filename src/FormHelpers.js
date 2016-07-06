@@ -80,7 +80,7 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule) {
+    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule,forceSuccess) {
         validationResultHandler = rz.helpers.ensureFunction(validationResultHandler);
         var formData = $this.sender.getFormData();
         var $that = this;
@@ -90,11 +90,13 @@ rz.widgets.formHelpers = {
             params.validation.rules.forEach(function (rule) {
                 var fieldID = $("#" + $this.target +  "base_form .field[data-model='"+rule.model+"']").attr("id");
                 if((fieldsetRule!==undefined && $that.fieldMatchFieldSetRule(fieldID,fieldsetRule)) || fieldsetRule===undefined){
-                    rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
-                        if (!result) {
-                            $this.sender.validationReport.push({failedRule: rule});
-                        }
-                    });
+                    if(!forceSuccess){
+                        rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
+                            if (!result) {
+                                $this.sender.validationReport.push({failedRule: rule});
+                            }
+                        });
+                    }
                 }
             });
             $this.sender.isFormInvalid = $this.sender.validationReport.length > 0;

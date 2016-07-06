@@ -130,6 +130,22 @@
                 {model: "password", label: "Senha", type: "password", id: "pwd"},
                 {model: "passwordC", label: "Confirmar Senha", type: "password", id: "pwdC"}
             ]
+        },
+        {
+            fieldGroup:true,
+            groupLabel:"Endereços",
+            fields:[
+                {model: "Rua", label: "Rua", type: "text", id: "rua" , fieldSetName:"enderecos"},
+                {model: "Bairro", label: "Bairro", type: "text", id: "bairro" , fieldSetName:"enderecos"},
+                {model: "Cidade", label: "Cidade", type: "text", id: "cidade", fieldSetName:"enderecos"},
+                {
+                    model:"Enderecos[]", label:"Endereços", type:"collection",id:"colend",
+                    itemsSource:{
+                        type:"fieldset", //"form"
+                        source:"enderecos"
+                    }
+                }
+            ]
         }
 
     ];

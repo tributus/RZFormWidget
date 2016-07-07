@@ -23,7 +23,7 @@
         }
     </style>
 
-    <script src="../bower_components/RZClientEngine/dist/RZClientEngine-standalone.min.js"></script>
+    <script src="../bower_components/rutezangada-clientengine/dist/RZClientEngine-standalone.min.js"></script>
     <script src="../bower_components/semantic-ui-form/form.min.js"></script>
     <script src="../bower_components/semantic-ui-tab/tab.min.js"></script>
     <script src="../bower_components/semantic-ui-accordion/accordion.min.js"></script>
@@ -138,6 +138,12 @@
                 {model: "Rua", label: "Rua", type: "text", id: "rua" , fieldSetName:"enderecos"},
                 {model: "Bairro", label: "Bairro", type: "text", id: "bairro" , fieldSetName:"enderecos"},
                 {model: "Cidade", label: "Cidade", type: "text", id: "cidade", fieldSetName:"enderecos"},
+                {
+                    type: "actions",
+                    actions:[
+                        {type:"button", name:"add-to-collection",label:"adicionar",cssClass:"primary"}
+                    ]
+                },
                 {
                     model:"Enderecos[]", label:"Endereços", type:"collection",id:"colend",
                     itemsSource:{

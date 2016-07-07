@@ -15,7 +15,14 @@ rz.widgets.formHelpers = {
         this.fieldRenderers[field.type].render(sb, field, containerID);
     },
     resolveModelName: function (field, generatedID) {
-        return (field.model !== undefined && field.model.match(/^[a-zA-Z]+[0-9]*(\.[a-zA-Z]+[0-9]*)*$/) != null) ? field.model : generatedID + "_data";
+        var hasGetAndSet = (rz.widgets.formHelpers.fieldRenderers[field.type].getValue !==undefined && rz.widgets.formHelpers.fieldRenderers[field.type].setValue !==undefined);
+        if(hasGetAndSet){
+            return (field.model !== undefined && field.model.match(/^[a-zA-Z]+[0-9]*(\.[a-zA-Z]+[0-9]*)*$/) != null) ? field.model : generatedID + "_data";
+        }
+        else{
+            return "***";
+        }
+
     },
     getInitialValueData: function (field) {
         var data = field.initialValue;
@@ -66,11 +73,19 @@ rz.widgets.formHelpers = {
     },
     getValueOfField: function (id) {
         var fieldType = $(id).data("fieldtype");
-        return this.fieldRenderers[fieldType].getValue(id + "_" + fieldType);
+        if(this.fieldRenderers[fieldType].getValue){
+            return this.fieldRenderers[fieldType].getValue(id + "_" + fieldType);
+        }
+        else{
+            return undefined;
+        }
+
     },
     setValueOfField: function (id, newValue) {
         var fieldType = $(id).data("fieldtype");
-        this.fieldRenderers[fieldType].setValue(id + "_" + fieldType, newValue);
+        if(this.fieldRenderers[fieldType].setValue){
+            this.fieldRenderers[fieldType].setValue(id + "_" + fieldType, newValue);
+        }
     },
     emit: function (n, d, sender) {
         var handlers = sender.getEventHandlers();
@@ -134,13 +149,15 @@ rz.widgets.formHelpers = {
         for (var i = 0; i < rcount; i++) {
             var id = $this.getFieldIdAt(i);
             var model = $("#" + id).data("model");
-            if(fieldsetRule!==undefined){
-                if(this.fieldMatchFieldSetRule(id,fieldsetRule)){
+            if(model!==undefined && model !="***"){
+                if(fieldsetRule!==undefined){
+                    if(this.fieldMatchFieldSetRule(id,fieldsetRule)){
+                        rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
+                    }
+                }
+                else{
                     rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
                 }
-            }
-            else{
-                rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
             }
 
         }
@@ -152,8 +169,10 @@ rz.widgets.formHelpers = {
             var id = $this.getFieldIdAt(i);
             if((fieldsetRule!==undefined && this.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
                 var model = $("#" + id).data("model");
-                var value = rz.helpers.jsonUtils.getDataAtPath(formData, model);
-                $this.setValueOfModel(model, value);
+                if(model !==undefined && model !="***"){
+                    var value = rz.helpers.jsonUtils.getDataAtPath(formData, model);
+                    $this.setValueOfModel(model, value);
+                }
             }
         }
     },

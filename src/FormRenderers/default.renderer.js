@@ -149,12 +149,14 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             if(h) sb.appendFormat('<div class="sixteen wide field">');
 
+            if(field.label !==undefined){
+                sb.appendFormat('<label for="{1}" class="{2}">{0}</label>',
+                    field.label,
+                    inputID,
+                    "control-label"
+                );
+            }
 
-            sb.appendFormat('<label for="{1}" class="{2}">{0}</label>',
-                field.label,
-                inputID,
-                "control-label"
-            );
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
             if(h) {
                 sb.appendFormat('</div>');

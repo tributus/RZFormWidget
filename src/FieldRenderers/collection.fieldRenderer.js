@@ -4,10 +4,6 @@
 rz.widgets.formHelpers.createFieldRenderer("collection", {
     render: function (sb, field, containerID) {
 
-        sb.appendFormat('<h4 class="ui horizontal divider header">');
-        sb.appendFormat('    <button class="ui primary button">Add</button>');
-        sb.appendFormat('</h4>');
-
         // sb.appendFormat('<div class="ui flat segment">');
         // sb.appendFormat('<button class="ui primary button">Add</button>');
         // sb.appendFormat('<button class="ui primary button">Clear</button>');

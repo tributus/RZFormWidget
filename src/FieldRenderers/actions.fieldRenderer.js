@@ -2,23 +2,34 @@
  * Created by anderson.santos on 06/07/2016.
  */
 rz.widgets.formHelpers.createFieldRenderer("actions", {
+    actionRenderers : {
+        button:function(actionData, sb,containerID){
+            sb.appendFormat('<button id="{3}_action-button" class="ui {2} button rz-action-handler" data-action="{0}">{1}</button>',
+                actionData.name,
+                actionData.label || "",
+                actionData.cssClass || "primary",
+                containerID
+            );
+        }
+    },
     render: function (sb, field, containerID) {
-        sb.appendFormat('<h4 class="ui horizontal divider header">');
-        sb.appendFormat('    <button class="ui primary button">Add</button>');
-        sb.appendFormat('</h4>');
+        var $this = this;
+        if(field.actions !==undefined){
+            field.actions.forEach(function(action){
+                $this.actionRenderers[action.type](action,sb,containerID);
+            });
+        }
         return containerID + "_collection";
     },
-    getValue: function (id) {
-        //return $(id).val();
-    },
-    setValue: function (id, newValue) {
-        //$(id).val(newValue || "");
-        throw "errrrrrrr";
-    },
     bindEvents: function (id, emit, sender) {
-        //     $("#" + id).change(function (e) {
-        //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
-        //     });
+            $("#" + id + " .button.rz-action-handler").click(function (e) {
+                var action  = $(e.currentTarget).data("action");
+                if(action!==undefined){
+                    emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
+                    return false;
+                }
+
+            });
     },
     doPosRenderActions: function (id, $this) {}
 

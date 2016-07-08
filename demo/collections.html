@@ -146,9 +146,19 @@
                 },
                 {
                     model:"Enderecos[]", label:"Endereços", type:"collection",id:"colend",
+                    maineElementCss:"ui raised secondary segment",
+                    collectionContainerCssClsss:"middle aligned divided",
                     itemsSource:{
                         type:"fieldset", //"form"
-                        source:"enderecos"
+                        source:"enderecos",
+                        trigger:"add-to-collection"
+                    },
+                    itemActions: {
+                        actionsMenuTitle:"Actions",
+                        actions:[
+                            {name: "Excluir item", action: "remove-item", icon: "delete"},
+                            {name: "Editar item", action: "edit-item", icon: "edit"}
+                        ]
                     }
                 }
             ]
@@ -207,6 +217,16 @@
                     valueType: "text",
                     operator: "==",
                     message: "As senhas não coincidem"
+                },
+                {
+                    type:"required",
+                    model: "Rua",
+                    message:"Informe a rua"
+                },
+                {
+                    type:"required",
+                    model: "Cidade",
+                    message:"Informe a cidade"
                 }
             ]
         }
@@ -290,11 +310,6 @@
     $("#clearformdataButton").click(function () {
         widgetInstance.clearFormData(getRulesetData());
     });
-
-
-
-
-
 
 
     function validarCNPJ(cnpj) {

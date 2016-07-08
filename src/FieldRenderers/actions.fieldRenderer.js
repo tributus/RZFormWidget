@@ -23,12 +23,17 @@ rz.widgets.formHelpers.createFieldRenderer("actions", {
     },
     bindEvents: function (id, emit, sender) {
             $("#" + id + " .button.rz-action-handler").click(function (e) {
-                var action  = $(e.currentTarget).data("action");
-                if(action!==undefined){
-                    emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
+                try{
+                    var action  = $(e.currentTarget).data("action");
+                    if(action!==undefined){
+                        emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
+                    }
                     return false;
                 }
-
+                catch (e){
+                    console.error(e);
+                    return false;
+                }
             });
     },
     doPosRenderActions: function (id, $this) {}

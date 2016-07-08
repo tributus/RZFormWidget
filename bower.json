@@ -29,7 +29,9 @@
     "semantic-ui-accordion": "^2.1.8",
     "semantic-ui-menu": "^2.1.7",
     "semantic-ui-segment": "^2.1.7",
-    "RZClientEngine": "rutezangada-client-engine#^0.1.5",
-    "semantic-ui-message": "^2.1.7"
+    "semantic-ui-message": "^2.1.7",
+    "semantic-ui-dropdown": "^2.2.1",
+    "semantic-ui-transition": "^2.2.1",
+    "rutezangada-clientengine": "^0.3.0"
   }
 }

@@ -151,11 +151,13 @@
                     itemsSource:{
                         type:"fieldset", //"form"
                         source:"enderecos",
-                        trigger:"add-to-collection"
+                        trigger:"add-to-collection",
+                        displayMemberPath:"Rua", //only for default renderer
+                        renderer:"default-list"
                     },
                     itemActions: {
                         hideActionsMenu:false,
-                        renderer:"default",
+                        renderer:"default-actions",
                         properties:{
                             title:"AçõesDD"
                         },

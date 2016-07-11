@@ -6,6 +6,20 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         var pid = (id.startsWith("#")) ? id :"#" + id;
         return JSON.parse(atob($(pid).data("field-params")));
     },
+    getContentRenderer : function(params){
+        var contentRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.renderer");
+        if(contentRenderer===undefined){
+            return rz.widgets.formHelpers.getFieldPartRenderer("default-list","collection");
+        }
+        else{
+            if(typeof(contentRenderer=="string")){
+                return rz.widgets.formHelpers.getFieldPartRenderer(contentRenderer,"collection");
+            }
+            else{
+                return contentRenderer;
+            }
+        }
+    },
     render: function (sb, field, containerID) {
         sb.appendFormat('<div class="{0}">',field.maineElementCss || "ui raised secondary segment");
         sb.appendFormat('   <div id="{0}_collection_container" class="ui {1} list collection-container">', containerID,field.collectionContainerCssClsss || "middle aligned divided");
@@ -29,7 +43,9 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         }
 
         sb.appendFormat('           <div class="content">');
-        sb.appendFormat('               Lindsay');
+        var contentRenderer = this.getContentRenderer(fieldParams);
+        contentRenderer(sb,fieldParams,newValue);
+
         sb.appendFormat('           </div>');
         sb.appendFormat('       </div>');
         sb.appendFormat('<script>$(".ui.dropdown").dropdown()</script>');
@@ -37,6 +53,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
 
     },
+
     bindEvents: function (id, emit, sender) {
         var fieldParams = this.getFieldParams(id);
         var fieldsets = {
@@ -64,7 +81,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
     },
     doPosRenderActions: function (id, $this) {}
 });
-rz.widgets.formHelpers.createFieldPartRenderer("default",function(sb,params){
+rz.widgets.formHelpers.createFieldPartRenderer("default-actions",function(sb,params){
     var ensureActions = function(){
         if(params.itemActions === undefined) params.itemActions = {};
         if(params.itemActions.actions === undefined){
@@ -84,9 +101,19 @@ rz.widgets.formHelpers.createFieldPartRenderer("default",function(sb,params){
     params.itemActions.actions.forEach(function(action){
         sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}"></i> {2}</div>',action.icon,action.action,action.name);
     });
-    // sb.appendFormat('            <div class="item"><i class="delete icon"></i> Excluir item</div>');
-
     sb.appendFormat('        </div>');
     sb.appendFormat('    </div>');
     sb.appendFormat('</div>');
 },"collection");
+
+rz.widgets.formHelpers.createFieldPartRenderer("default-list", function(sb,params,data){
+    var dmp = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.displayMemberPath");
+    var  text = "";
+    if(  dmp !==undefined){
+        text = (data!==undefined) ? rz.helpers.jsonUtils.getDataAtPath(data, dmp):"";
+    }
+    else{
+         text = (data!==undefined) ? data.toString():"";
+    }
+    sb.appendFormat(text);
+},'collection');

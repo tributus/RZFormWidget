@@ -154,7 +154,11 @@
                         trigger:"add-to-collection"
                     },
                     itemActions: {
-                        actionsMenuTitle:"Actions",
+                        hideActionsMenu:false,
+                        renderer:"default",
+                        properties:{
+                            title:"AçõesDD"
+                        },
                         actions:[
                             {name: "Excluir item", action: "remove-item", icon: "delete"},
                             {name: "Editar item", action: "edit-item", icon: "edit"}

@@ -4,6 +4,7 @@
 rz.widgets.formHelpers = {
     fieldRenderers: {},
     dataValidators: {},
+    fieldPartRenderers:{},
     renderDataRows: function (sb, params, renderDataRow) {
         if (params.fields !== undefined) {
             params.fields.forEach(function (it, ix) {
@@ -35,6 +36,20 @@ rz.widgets.formHelpers = {
     },
     createFieldRenderer: function (n, d) {
         this.fieldRenderers[n] = d;
+    },
+    createFieldPartRenderer:function(n,d,t){
+        var name = (t===undefined)? n: t+"."+n;
+        this.fieldPartRenderers[name] = d;
+    },
+    getFieldPartRenderer: function(n,t){
+        var name = (t===undefined)? n: t+"."+n;
+        var renderer = this.fieldPartRenderers[name];
+        if(renderer !==undefined){
+            return renderer;
+        }
+        else{
+            throw "Fiel part renderer \"*\" not found".replace("*",name);
+        }
     },
     createFormValidator: function (n, d) {
         this.dataValidators[n] = d;

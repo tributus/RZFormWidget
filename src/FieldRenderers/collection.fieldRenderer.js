@@ -46,12 +46,11 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         });
         return results;
     },
-    setValue: function (id, newValue,sender) {
-        //todo: value = null_or_undefined => clear collection
-        var fieldParams = this.getFieldParams(id.substring(0,id.lastIndexOf("_collection")).replace("#",""),sender.renderer.params.fields); /*particular for non input controls*/
+    setValue: function (fid, newValue,sender) {
+        var id = fid.substring(0,fid.lastIndexOf("_collection")); /*particular for non input controls*/
+        var fieldParams = this.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
         var sb = new StringBuilder();
         var $this = this;
-
         var processAddValue = function(item){
             sb.appendFormat('       <div class="item collection-dataitem" data-value="{0}">',(item!==undefined && item !==null)?btoa(JSON.stringify(item)):item);
             if(!fieldParams.itemActions.hideActionsMenu){
@@ -68,11 +67,18 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             sb.appendFormat('       </div>');
         };
 
+        var clearCollectionData = function(){
+            $(fid + "_collection_container").empty();
+        };
+
 
         if(newValue !==undefined && newValue.length !== undefined){
             newValue.forEach(function(item){
                 processAddValue(item);
             });
+        }
+        else if(newValue===undefined || newValue===null){
+            clearCollectionData();
         }
         else{
             processAddValue(newValue);
@@ -80,7 +86,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
 
         sb.appendFormat('<script>$(".ui.dropdown").dropdown()</script>');
-        $(id + "_collection_container").append(sb.toString());
+        $(fid + "_collection_container").append(sb.toString());
     },
 
     bindEvents: function (id, emit, sender) {

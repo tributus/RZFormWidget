@@ -114,7 +114,7 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         var p = position;
         if (p >= 0 && p < this.fieldCount()) {
             var id = $("#" + $this.target + "base_form > .row-form-field").eq(p).attr("id");
-            rz.widgets.formHelpers.setValueOfField("#" + id, value);
+            rz.widgets.formHelpers.setValueOfField("#" + id, value,$this.sender);
             rz.widgets.formHelpers.emit("data-changed", {fieldid: id, value: value, src: "code"}, $this.sender);
         }
     };

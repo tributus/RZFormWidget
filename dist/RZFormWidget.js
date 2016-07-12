@@ -82,7 +82,8 @@ rz.widgets.formHelpers = {
             return "";
         }
         else {
-            return (typeof(data) === "object") ? "object-data:[" + btoa(JSON.stringify(data)) + "]" : data;
+            var d = (typeof(data) === "object") ? "object-data:[" + btoa(JSON.stringify(data)) + "]" : data;
+            return 'data-initial-value="*"'.replace("*",d);
         }
     },
     createFieldRenderer: function (n, d) {
@@ -399,12 +400,11 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         });
         return results;
     },
-    setValue: function (id, newValue,sender) {
-        //todo: value = null_or_undefined => clear collection
-        var fieldParams = this.getFieldParams(id.substring(0,id.lastIndexOf("_collection")).replace("#",""),sender.renderer.params.fields); /*particular for non input controls*/
+    setValue: function (fid, newValue,sender) {
+        var id = fid.substring(0,fid.lastIndexOf("_collection")); /*particular for non input controls*/
+        var fieldParams = this.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
         var sb = new StringBuilder();
         var $this = this;
-
         var processAddValue = function(item){
             sb.appendFormat('       <div class="item collection-dataitem" data-value="{0}">',(item!==undefined && item !==null)?btoa(JSON.stringify(item)):item);
             if(!fieldParams.itemActions.hideActionsMenu){
@@ -421,11 +421,18 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             sb.appendFormat('       </div>');
         };
 
+        var clearCollectionData = function(){
+            $(fid + "_collection_container").empty();
+        };
+
 
         if(newValue !==undefined && newValue.length !== undefined){
             newValue.forEach(function(item){
                 processAddValue(item);
             });
+        }
+        else if(newValue===undefined || newValue===null){
+            clearCollectionData();
         }
         else{
             processAddValue(newValue);
@@ -433,7 +440,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
 
         sb.appendFormat('<script>$(".ui.dropdown").dropdown()</script>');
-        $(id + "_collection_container").append(sb.toString());
+        $(fid + "_collection_container").append(sb.toString());
     },
 
     bindEvents: function (id, emit, sender) {
@@ -767,7 +774,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}{6}">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
@@ -867,7 +874,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var id = $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
             var formerValue = rz.widgets.formHelpers.getValueOfField("#" + id);
             if (formerValue != value) {
-                rz.widgets.formHelpers.setValueOfField("#" + id, value,$this);
+                rz.widgets.formHelpers.setValueOfField("#" + id, value,$this.sender);
                 rz.widgets.formHelpers.emit("data-changed", {fieldid: id, value: value, src: "code"}, $this.sender);
             }
         }
@@ -893,7 +900,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     this.clearFormData = function (fieldsetRule) {
-        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule,$this);
+        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule,$this.sender);
     };
 
     /**
@@ -1026,7 +1033,7 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         var p = position;
         if (p >= 0 && p < this.fieldCount()) {
             var id = $("#" + $this.target + "base_form > .row-form-field").eq(p).attr("id");
-            rz.widgets.formHelpers.setValueOfField("#" + id, value);
+            rz.widgets.formHelpers.setValueOfField("#" + id, value,$this.sender);
             rz.widgets.formHelpers.emit("data-changed", {fieldid: id, value: value, src: "code"}, $this.sender);
         }
     };

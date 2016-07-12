@@ -31,7 +31,8 @@ rz.widgets.formHelpers = {
             return "";
         }
         else {
-            return (typeof(data) === "object") ? "object-data:[" + btoa(JSON.stringify(data)) + "]" : data;
+            var d = (typeof(data) === "object") ? "object-data:[" + btoa(JSON.stringify(data)) + "]" : data;
+            return 'data-initial-value="*"'.replace("*",d);
         }
     },
     createFieldRenderer: function (n, d) {

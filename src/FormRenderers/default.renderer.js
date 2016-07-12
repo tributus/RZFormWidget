@@ -137,7 +137,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}{6}">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
@@ -237,7 +237,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var id = $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
             var formerValue = rz.widgets.formHelpers.getValueOfField("#" + id);
             if (formerValue != value) {
-                rz.widgets.formHelpers.setValueOfField("#" + id, value,$this);
+                rz.widgets.formHelpers.setValueOfField("#" + id, value,$this.sender);
                 rz.widgets.formHelpers.emit("data-changed", {fieldid: id, value: value, src: "code"}, $this.sender);
             }
         }
@@ -263,7 +263,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     this.clearFormData = function (fieldsetRule) {
-        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule,$this);
+        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule,$this.sender);
     };
 
     /**

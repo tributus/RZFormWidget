@@ -153,7 +153,7 @@
                         source:"enderecos",
                         trigger:"add-to-collection",
                         displayMemberPath:"Rua", //only for default renderer
-                        renderer:"default-list"
+                        renderer: function(sb,params,data){sb.appendFormat('<h1>{0}</h1>',data.Rua);} //"default-list"
                     },
                     itemActions: {
                         hideActionsMenu:false,

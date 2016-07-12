@@ -2,10 +2,10 @@
  * Created by anderson.santos on 06/07/2016.
  */
 rz.widgets.formHelpers.createFieldRenderer("collection", {
-    getFieldParams:function(id){
-        var pid = (id.startsWith("#")) ? id :"#" + id;
-        return JSON.parse(atob($(pid).data("field-params")));
-    },
+    // getFieldParams:function(id){
+    //     var pid = (id.startsWith("#")) ? id :"#" + id;
+    //     return JSON.parse(atob($(pid).data("field-params")));
+    // },
     getContentRenderer : function(params){
         var contentRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.renderer");
         if(contentRenderer===undefined){
@@ -27,11 +27,11 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         sb.appendFormat('</div>');
         return containerID + "_collection";
     },
-    getValue: function (id) {
+    getValue: function (id,fieldParams) {
         //return $(id).val();
     },
-    setValue: function (id, newValue) {
-        var fieldParams = this.getFieldParams(id.substring(0,id.lastIndexOf("_collection"))); /*particular for non input controls*/
+    setValue: function (id, newValue,fieldParams) {
+        //var fieldParams = this.getFieldParams(id.substring(0,id.lastIndexOf("_collection"))); /*particular for non input controls*/
         var sb = new StringBuilder();
         sb.appendFormat('       <div class="item">');
         if(!fieldParams.itemActions.hideActionsMenu){
@@ -54,8 +54,8 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
     },
 
-    bindEvents: function (id, emit, sender) {
-        var fieldParams = this.getFieldParams(id);
+    bindEvents: function (id, emit, sender,fieldParams) {
+        //var fieldParams = this.getFieldParams(id);
         var fieldsets = {
             rule:'restrict',
             fieldsets: fieldParams.itemsSource.source.split(' ')

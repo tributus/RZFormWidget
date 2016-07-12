@@ -137,15 +137,15 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}{6}" data-field-params="{7}">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="form-row {4}{5}{6}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
                 (h)? "inline fields":"field",
                 (field.wide !==undefined)? " " + field.wide + " wide":"",
-                rz.widgets.formHelpers.resolveFieldSet(field),
-                btoa(JSON.stringify(field))
+                rz.widgets.formHelpers.resolveFieldSet(field)
+
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             if(h) sb.appendFormat('<div class="sixteen wide field">');

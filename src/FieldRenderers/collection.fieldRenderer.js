@@ -2,17 +2,27 @@
  * Created by anderson.santos on 06/07/2016.
  */
 rz.widgets.formHelpers.createFieldRenderer("collection", {
-    // getFieldParams:function(id){
-    //     var pid = (id.startsWith("#")) ? id :"#" + id;
-    //     return JSON.parse(atob($(pid).data("field-params")));
-    // },
+    getFieldParams:function(id,fieldDefinitions){
+        for(var i=0;i<fieldDefinitions.length;i++){
+            var fieldDefinition = fieldDefinitions[i];
+            if(fieldDefinition.fieldGroup){
+                var fieldDefinition = this.getFieldParams(id,fieldDefinition.fields);
+                if(fieldDefinition!==undefined) return fieldDefinition;
+            }
+            else{
+                if(fieldDefinition.id==id){
+                    return fieldDefinition;
+                }
+            }
+        }
+    },
     getContentRenderer : function(params){
         var contentRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.renderer");
         if(contentRenderer===undefined){
             return rz.widgets.formHelpers.getFieldPartRenderer("default-list","collection");
         }
         else{
-            if(typeof(contentRenderer=="string")){
+            if(typeof(contentRenderer)=="string"){
                 return rz.widgets.formHelpers.getFieldPartRenderer(contentRenderer,"collection");
             }
             else{
@@ -27,35 +37,54 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         sb.appendFormat('</div>');
         return containerID + "_collection";
     },
-    getValue: function (id,fieldParams) {
-        //return $(id).val();
+    getValue: function (id) {
+        var results = [];
+        id = id.substring(0,id.lastIndexOf("_collection"));
+        $(id + " .collection-dataitem").each(function(idx, item){
+            var data = $(item).data("value");
+            results.push(JSON.parse(atob(data)));
+        });
+        return results;
     },
-    setValue: function (id, newValue,fieldParams) {
-        //var fieldParams = this.getFieldParams(id.substring(0,id.lastIndexOf("_collection"))); /*particular for non input controls*/
+    setValue: function (id, newValue,sender) {
+        //todo: value = null_or_undefined => clear collection
+        var fieldParams = this.getFieldParams(id.substring(0,id.lastIndexOf("_collection")).replace("#",""),sender.renderer.params.fields); /*particular for non input controls*/
         var sb = new StringBuilder();
-        sb.appendFormat('       <div class="item">');
-        if(!fieldParams.itemActions.hideActionsMenu){
-            var actionsRenderer = fieldParams.itemActions.renderer || "default";
-            if(typeof(actionsRenderer)=="string"){
-                actionsRenderer = rz.widgets.formHelpers.getFieldPartRenderer(actionsRenderer,"collection")
+        var $this = this;
+
+        var processAddValue = function(item){
+            sb.appendFormat('       <div class="item collection-dataitem" data-value="{0}">',(item!==undefined && item !==null)?btoa(JSON.stringify(item)):item);
+            if(!fieldParams.itemActions.hideActionsMenu){
+                var actionsRenderer = fieldParams.itemActions.renderer || "default";
+                if(typeof(actionsRenderer)=="string"){
+                    actionsRenderer = rz.widgets.formHelpers.getFieldPartRenderer(actionsRenderer,"collection")
+                }
+                actionsRenderer(sb,fieldParams);
             }
-            actionsRenderer(sb,fieldParams);
+            sb.appendFormat('           <div class="content">');
+            var contentRenderer = $this.getContentRenderer(fieldParams);
+            contentRenderer(sb,fieldParams,item);
+            sb.appendFormat('           </div>');
+            sb.appendFormat('       </div>');
+        };
+
+
+        if(newValue !==undefined && newValue.length !== undefined){
+            newValue.forEach(function(item){
+                processAddValue(item);
+            });
+        }
+        else{
+            processAddValue(newValue);
         }
 
-        sb.appendFormat('           <div class="content">');
-        var contentRenderer = this.getContentRenderer(fieldParams);
-        contentRenderer(sb,fieldParams,newValue);
 
-        sb.appendFormat('           </div>');
-        sb.appendFormat('       </div>');
         sb.appendFormat('<script>$(".ui.dropdown").dropdown()</script>');
         $(id + "_collection_container").append(sb.toString());
-
-
     },
 
-    bindEvents: function (id, emit, sender,fieldParams) {
-        //var fieldParams = this.getFieldParams(id);
+    bindEvents: function (id, emit, sender) {
+        var fieldParams = this.getFieldParams(id, sender.renderer.params.fields);
         var fieldsets = {
             rule:'restrict',
             fieldsets: fieldParams.itemsSource.source.split(' ')

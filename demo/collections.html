@@ -145,7 +145,7 @@
                     ]
                 },
                 {
-                    model:"Enderecos[]", label:"Endereços", type:"collection",id:"colend",
+                    model:"Enderecos", label:"Endereços", type:"collection",id:"colend",
                     maineElementCss:"ui raised secondary segment",
                     collectionContainerCssClsss:"middle aligned divided",
                     itemsSource:{
@@ -153,7 +153,7 @@
                         source:"enderecos",
                         trigger:"add-to-collection",
                         displayMemberPath:"Rua", //only for default renderer
-                        renderer: function(sb,params,data){sb.appendFormat('<h1>{0}</h1>',data.Rua);} //"default-list"
+                        renderer: "default-list" //function(sb,params,data){sb.appendFormat('<h1>{0}</h1>',data.Rua);}
                     },
                     itemActions: {
                         hideActionsMenu:false,

@@ -48,7 +48,7 @@ rz.widgets.formHelpers = {
             return renderer;
         }
         else{
-            throw "Fiel part renderer \"*\" not found".replace("*",name);
+            throw "Field part renderer \"*\" not found".replace("*",name);
         }
     },
     createFormValidator: function (n, d) {
@@ -86,20 +86,20 @@ rz.widgets.formHelpers = {
             this.fieldRenderers[type].doPosRenderActions(id, sender);
         }
     },
-    getValueOfField: function (id) {
+    getValueOfField: function (id,sender) {
         var fieldType = $(id).data("fieldtype");
         if(this.fieldRenderers[fieldType].getValue){
-            return this.fieldRenderers[fieldType].getValue(id + "_" + fieldType);
+            return this.fieldRenderers[fieldType].getValue(id + "_" + fieldType,sender);
         }
         else{
             return undefined;
         }
 
     },
-    setValueOfField: function (id, newValue) {
+    setValueOfField: function (id, newValue,sender) {
         var fieldType = $(id).data("fieldtype");
         if(this.fieldRenderers[fieldType].setValue){
-            this.fieldRenderers[fieldType].setValue(id + "_" + fieldType, newValue);
+            this.fieldRenderers[fieldType].setValue(id + "_" + fieldType, newValue,sender);
         }
     },
     emit: function (n, d, sender) {

@@ -237,7 +237,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var id = $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
             var formerValue = rz.widgets.formHelpers.getValueOfField("#" + id);
             if (formerValue != value) {
-                rz.widgets.formHelpers.setValueOfField("#" + id, value);
+                rz.widgets.formHelpers.setValueOfField("#" + id, value,$this);
                 rz.widgets.formHelpers.emit("data-changed", {fieldid: id, value: value, src: "code"}, $this.sender);
             }
         }
@@ -249,7 +249,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
         var formerValue = rz.widgets.formHelpers.getValueOfField("#" + fieldid);
         if (formerValue != value) {
-            rz.widgets.formHelpers.setValueOfField("#" + fieldid, value);
+            rz.widgets.formHelpers.setValueOfField("#" + fieldid, value,$this.sender);
             rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
         }
     };
@@ -259,11 +259,11 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     this.setFormData = function(formData,fieldsetRule){
-        rz.widgets.formHelpers.setFormDataImpl(formData,$this,fieldsetRule);
+        rz.widgets.formHelpers.setFormDataImpl(formData,$this,fieldsetRule,$this);
     };
 
     this.clearFormData = function (fieldsetRule) {
-        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule);
+        rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule,$this);
     };
 
     /**

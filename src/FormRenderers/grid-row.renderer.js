@@ -123,7 +123,7 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         if (!fieldid.startsWith($this.target + "_")) {
             fieldid = $this.target + "_" + fieldid;
         }
-        rz.widgets.formHelpers.setValueOfField("#" + fieldid, value);
+        rz.widgets.formHelpers.setValueOfField("#" + fieldid, value,$this.sender);
         rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
     };
 

@@ -47,12 +47,19 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         return results;
     },
     setValue: function (fid, newValue,sender) {
+        var newElementIDS = [];
         var id = fid.substring(0,fid.lastIndexOf("_collection")); /*particular for non input controls*/
         var fieldParams = this.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
         var sb = new StringBuilder();
         var $this = this;
         var processAddValue = function(item){
-            sb.appendFormat('       <div class="item collection-dataitem" data-value="{0}">',(item!==undefined && item !==null)?btoa(JSON.stringify(item)):item);
+            var itemid = id.replace("#","") + rz.helpers.generateRandomID();
+            sb.appendFormat('       <div id="{1}" class="item collection-dataitem" data-value="{0}">',
+                (item!==undefined && item !==null)?btoa(JSON.stringify(item)):item,
+                itemid
+            );
+            newElementIDS.push(itemid);
+            fieldParams.__uid = itemid;
             if(!fieldParams.itemActions.hideActionsMenu){
                 var actionsRenderer = fieldParams.itemActions.renderer || "default";
                 if(typeof(actionsRenderer)=="string"){
@@ -71,8 +78,26 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             $(fid + "_collection_container").empty();
         };
 
+        var initializeActionsDropdown = function(){
+            setTimeout(function(){
+                newElementIDS.forEach(function(item){
+                    var id = "#" + item + " .ui.dropdown";
+                    $(id).dropdown({
+                        action:"hide",
+                        onChange:function(item){
+                            var action = $(item).data("action");
+                            var rowID = $(item).data("rowid");
+                            var rowData = JSON.parse(atob($("#" + rowID).data("value")));
+                            sender.raiseEvent("collection-request-change",{action:action,rowid:rowID,rowData:rowData},sender);
+                        }
+                    });
 
-        if(newValue !==undefined && newValue.length !== undefined){
+                });
+                newElementIDS = [];
+            },100);
+        };
+
+        if(newValue !==undefined && typeof(newValue)==="object" && newValue.length !== undefined){
             newValue.forEach(function(item){
                 processAddValue(item);
             });
@@ -84,9 +109,9 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             processAddValue(newValue);
         }
 
-
-        sb.appendFormat('<script>$(".ui.dropdown").dropdown()</script>');
         $(fid + "_collection_container").append(sb.toString());
+        initializeActionsDropdown();
+
     },
 
     bindEvents: function (id, emit, sender) {
@@ -134,7 +159,7 @@ rz.widgets.formHelpers.createFieldPartRenderer("default-actions",function(sb,par
     sb.appendFormat('        <div class="menu">');
     sb.appendFormat('            <div class="header">{0}</div>',title);
     params.itemActions.actions.forEach(function(action){
-        sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}"></i> {2}</div>',action.icon,action.action,action.name);
+        sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}"></i> {2}</div>',action.icon,action.action,action.name,params.__uid);
     });
     sb.appendFormat('        </div>');
     sb.appendFormat('    </div>');

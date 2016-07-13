@@ -97,16 +97,17 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
 
-            sb.appendFormat('<tr id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" {4} class="field field-row{5}">',
+            sb.appendFormat('<tr id="{0}" data-fieldtype="{1}" data-model="{2}" {3} {4} class="field field-row{5} {6}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
                 gidata || "",
-                rz.widgets.formHelpers.resolveFieldSet(field)
+                rz.widgets.formHelpers.resolveFieldSet(field),
+                field.containerCssClass || ""
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
-            sb.appendFormat('<td><label for="{1}">{0}</label></td>', field.label, inputID);
+            sb.appendFormat('<td><label for="{1}" class="{2}">{0}</label></td>', field.label||"&nbsp;", inputID,field.labelCssClass||"");
             sb.appendFormat('<td>');
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
             sb.append('</td>');

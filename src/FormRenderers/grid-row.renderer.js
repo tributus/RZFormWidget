@@ -34,12 +34,13 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
 
-            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field field{4}">',
+            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field field{4} {5}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
-                rz.widgets.formHelpers.resolveFieldSet(field)
+                rz.widgets.formHelpers.resolveFieldSet(field),
+                field.containerCssClass || ""
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);

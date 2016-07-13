@@ -150,7 +150,9 @@
                 {
                     type: "actions",
                     actions:[
-                        {type:"button", name:"add-to-collection",label:"adicionar",cssClass:"primary"}
+                        {type:"button", name:"add-to-collection",label:"adicionar",cssClass:"primary"},
+                        {type:"button", name:"update-into-collection",label:"atualizar",cssClass:"primary"},
+                        {type:"button", name:"clear-collection",label:"limpar",cssClass:"secondary"}
                     ]
                 },
                 {
@@ -160,7 +162,9 @@
                     itemsSource:{
                         type:"fieldset", //"form"
                         source:"enderecos",
-                        trigger:"add-to-collection",
+                        addToCollectiontrigger:"add-to-collection",
+                        updateCollectionTrigger:"update-into-collection",
+                        clearCollectionTrigger:"clear-collection",
                         displayMemberPath:"Rua", //only for default renderer
                         itemsRenderer:{
                             renderer: "default-list", //function(sb,params,data){sb.appendFormat('<h1>{0}</h1>',data.Rua);},
@@ -176,10 +180,10 @@
                         properties:{
                             title:"AçõesDD"
                         },
-//                        confirmDeleteItemMethod:function(sender, e, callback){
-//                            var result = confirm("Confirma a exclusão deste item ? ");
-//                            callback(result);
-//                        },
+                        confirmDeleteItemMethod:function(sender, e, callback){
+                            var result = confirm("Confirma a exclusão deste item ? ");
+                            callback(result);
+                        },
                         actions:[
                             {name: "Excluir item", action: "remove-item", icon: "delete"},
                             {name: "Editar item", action: "edit-item", icon: "edit"}

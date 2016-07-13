@@ -137,24 +137,26 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6}">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6} {7}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
                 (h)? "inline fields":"field",
                 (field.wide !==undefined)? " " + field.wide + " wide":"",
-                rz.widgets.formHelpers.resolveFieldSet(field)
+                rz.widgets.formHelpers.resolveFieldSet(field),
+                field.containerCssClass || ""
 
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             if(h) sb.appendFormat('<div class="sixteen wide field">');
 
-            if(field.label !==undefined){
-                sb.appendFormat('<label for="{1}" class="{2}">{0}</label>',
-                    field.label,
+            if(field.label !==undefined || field.preserveLabelOffset){
+                sb.appendFormat('<label for="{1}" class="{2} {3}">{0}</label>',
+                    field.label || "&nbsp;",
                     inputID,
-                    "control-label"
+                    "control-label",
+                    field.labelCssClass || ""
                 );
             }
 

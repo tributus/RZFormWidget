@@ -23,6 +23,11 @@
     <script src="../bower_components/semantic-ui-transition/transition.min.js"></script> <!--requerido apenas pelo dropdown-->
     <script src="../bower_components/semantic-ui-dropdown/dropdown.min.js"></script> <!--requerido apenas pelo renderizador lista-->
     <script src="../dist/RZFormWidget.js"></script>
+    <style>
+        .highlight{
+            color: orange !important;
+        }
+    </style>
 </head>
 <body>
 <h1>Exemplo 1</h1>
@@ -138,17 +143,24 @@
                     fields:[
                         {
                             model: "PrimeiroNome",
-                            label: "Primeiro nome",
+                            containerCssClass:"required",
+                            labelCssClass:"highlight",
+                            label: "Nome",
                             type: "text",
                             id: "r0",
                             value: "Valor inicial",
                             initialValue: "",
                             attributes:[
-                                {name:"placeholder", value:"informe o primeiro nome"},
+                                {name:"placeholder", value:"Primeiro nome"},
                                 {name:"data-foo", value:"ba"}
                             ]
                         },
-                        {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: ""},
+                        {
+                            model: "UltimoNome", type: "text", id: "r1", initialValue: "", preserveLabelOffset:true,
+                            attributes:[
+                                {name:"placeholder", value:"Último nome"}
+                            ]
+                        },
                         {model: "Senha", label: "Senha", type: "password", id: "r12", initialValue: ""}
                     ]
                 }

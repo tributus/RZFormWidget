@@ -1,21 +1,24 @@
 /**
  * Created by anderson.santos on 06/07/2016.
  */
-rz.widgets.formHelpers.createFieldRenderer("collection", {
-    getFieldParams:function(id,fieldDefinitions){
-        for(var i=0;i<fieldDefinitions.length;i++){
-            var fieldDefinition = fieldDefinitions[i];
-            if(fieldDefinition.fieldGroup){
-                var fieldDefinition = this.getFieldParams(id,fieldDefinition.fields);
-                if(fieldDefinition!==undefined) return fieldDefinition;
-            }
-            else{
-                if(fieldDefinition.id==id){
-                    return fieldDefinition;
-                }
+
+//Helpers
+rz.widgets.formHelpers.getFieldParams = function(id,fieldDefinitions){
+    for(var i=0;i<fieldDefinitions.length;i++){
+        var fieldDefinition = fieldDefinitions[i];
+        if(fieldDefinition.fieldGroup){
+            var fieldDefinition = this.getFieldParams(id,fieldDefinition.fields);
+            if(fieldDefinition!==undefined) return fieldDefinition;
+        }
+        else{
+            if(fieldDefinition.id==id){
+                return fieldDefinition;
             }
         }
-    },
+    }
+};
+
+rz.widgets.formHelpers.createFieldRenderer("collection", {
     getContentRenderer : function(params){
         var contentRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.renderer");
         if(contentRenderer===undefined){
@@ -49,7 +52,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
     setValue: function (fid, newValue,sender) {
         var newElementIDS = [];
         var id = fid.substring(0,fid.lastIndexOf("_collection")); /*particular for non input controls*/
-        var fieldParams = this.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
+        var fieldParams = rz.widgets.formHelpers.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
         var sb = new StringBuilder();
         var $this = this;
         var processAddValue = function(item){
@@ -85,10 +88,12 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     $(id).dropdown({
                         action:"hide",
                         onChange:function(item){
-                            var action = $(item).data("action");
-                            var rowID = $(item).data("rowid");
+                            var $item = $(item);
+                            var action = $item.data("action");
+                            var rowID = $item.data("rowid");
+                            var fieldid = $item.data("targetfield");
                             var rowData = JSON.parse(atob($("#" + rowID).data("value")));
-                            sender.raiseEvent("collection-request-change",{action:action,rowid:rowID,rowData:rowData},sender);
+                            sender.raiseEvent("collection-request-change",{action:action,fieldid:fieldid,rowid:rowID,rowData:rowData},sender);
                         }
                     });
 
@@ -115,7 +120,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
     },
 
     bindEvents: function (id, emit, sender) {
-        var fieldParams = this.getFieldParams(id, sender.renderer.params.fields);
+        var fieldParams = rz.widgets.formHelpers.getFieldParams(id, sender.renderer.params.fields);
         var fieldsets = {
             rule:'restrict',
             fieldsets: fieldParams.itemsSource.source.split(' ')
@@ -134,10 +139,30 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             });
         }
 
+        sender.on("collection-request-change",function(sender,e){
+
+            var fieldid = e.fieldid;
+            var fieldParams = rz.widgets.formHelpers.getFieldParams(fieldid, sender.renderer.params.fields);
+
+            if(e.action=="edit-item"){
+                if(fieldParams.itemsSource.type=="fieldset"){
+                    sender.setFormData(e.rowData,{rule:"restrict", fieldsets:fieldParams.itemsSource.source.split(' ')});
+                    //todo add edit class on row;
+                }
+                else{ //if form
+                    throw "not implemented yeeeeeet";
+                }
+            }
+            else if(e.action=="delete-item"){
+                throw "not implemented yeeeeeet";
+            }
+            console.warn(e,sender);
+            //sender.raiseEvent(,{action:action,rowid:rowID,rowData:rowData},sender);
+        });
         //***************************************************registrar o datachange:*******************************
-    //     $("#" + id).change(function (e) {
-    //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
-    //     });
+        //     $("#" + id).change(function (e) {
+        //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
+        //     });
     },
     doPosRenderActions: function (id, $this) {}
 });
@@ -159,7 +184,13 @@ rz.widgets.formHelpers.createFieldPartRenderer("default-actions",function(sb,par
     sb.appendFormat('        <div class="menu">');
     sb.appendFormat('            <div class="header">{0}</div>',title);
     params.itemActions.actions.forEach(function(action){
-        sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}"></i> {2}</div>',action.icon,action.action,action.name,params.__uid);
+    sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}" data-targetfield="{4}"></i> {2}</div>',
+        action.icon,
+        action.action,
+        action.name,
+        params.__uid,
+        params.id
+    );
     });
     sb.appendFormat('        </div>');
     sb.appendFormat('    </div>');

@@ -20,7 +20,16 @@ rz.widgets.formHelpers.getFieldParams = function(id,fieldDefinitions){
 
 rz.widgets.formHelpers.createFieldRenderer("collection", {
     getContentRenderer : function(params){
-        var contentRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.renderer");
+        var itemsRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.itemsRenderer") ;
+        if(itemsRenderer==undefined){
+            itemsRenderer = {
+                renderer: "default-list",
+                    rendererParams: {
+                    editingText:"editing"
+                }
+            }
+        }
+        var contentRenderer = itemsRenderer.renderer;
         if(contentRenderer===undefined){
             return rz.widgets.formHelpers.getFieldPartRenderer("default-list","collection");
         }
@@ -34,7 +43,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         }
     },
     render: function (sb, field, containerID) {
-        sb.appendFormat('<div class="{0}">',field.maineElementCss || "ui raised secondary segment");
+        sb.appendFormat('<div class="{0}">',field.mainElementCss || "ui raised secondary segment");
         sb.appendFormat('   <div id="{0}_collection_container" class="ui {1} list collection-container">', containerID,field.collectionContainerCssClsss || "middle aligned divided");
         sb.appendFormat('   </div>');
         sb.appendFormat('</div>');
@@ -143,9 +152,18 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
             var fieldid = e.fieldid;
             var fieldParams = rz.widgets.formHelpers.getFieldParams(fieldid, sender.renderer.params.fields);
+            var deleteRow = function(){
+
+                $("#" + e.rowid).fadeOut("fast",function(){
+                    $("#" + e.rowid).detach();
+                });
+                //todo emit (changed)
+            };
 
             if(e.action=="edit-item"){
                 if(fieldParams.itemsSource.type=="fieldset"){
+                    $("#" + e.fieldid + " .collection-dataitem").removeClass("edit-mode");
+                    $("#" + e.rowid).addClass("edit-mode");
                     sender.setFormData(e.rowData,{rule:"restrict", fieldsets:fieldParams.itemsSource.source.split(' ')});
                     //todo add edit class on row;
                 }
@@ -153,10 +171,19 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     throw "not implemented yeeeeeet";
                 }
             }
-            else if(e.action=="delete-item"){
-                throw "not implemented yeeeeeet";
+            else if(e.action=="remove-item"){
+                var confirmMethod = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemActions.confirmDeleteItemMethod");
+                if(confirmMethod !==undefined  ){
+                    confirmMethod(sender,{fieldParams:fieldParams,originalEventArgs:e},function(confirm){
+                        if(confirm){
+                            deleteRow();
+                        }
+                    });
+                }
+                else{
+                    deleteRow();
+                }
             }
-            console.warn(e,sender);
             //sender.raiseEvent(,{action:action,rowid:rowID,rowData:rowData},sender);
         });
         //***************************************************registrar o datachange:*******************************
@@ -206,5 +233,8 @@ rz.widgets.formHelpers.createFieldPartRenderer("default-list", function(sb,param
     else{
          text = (data!==undefined) ? data.toString():"";
     }
+    sb.appendFormat('<div class="{0} collectionitem-edition-indicator">', rz.helpers.jsonUtils.getDataAtPath(params,'itemsSource.itemsRenderer.rendererParams["editingLabelClass"]') || "ui red ribbon label");
+    sb.appendFormat('  <i class="edit icon"></i> {0}', rz.helpers.jsonUtils.getDataAtPath(params,'itemsSource.itemsRenderer.rendererParams["editingText"]') || "");
+    sb.appendFormat('</div>');
     sb.appendFormat(text);
 },'collection');

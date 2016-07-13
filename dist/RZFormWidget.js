@@ -355,23 +355,35 @@ rz.widgets.formHelpers.createFieldRenderer("actions", {
 /**
  * Created by anderson.santos on 06/07/2016.
  */
-rz.widgets.formHelpers.createFieldRenderer("collection", {
-    getFieldParams:function(id,fieldDefinitions){
-        for(var i=0;i<fieldDefinitions.length;i++){
-            var fieldDefinition = fieldDefinitions[i];
-            if(fieldDefinition.fieldGroup){
-                var fieldDefinition = this.getFieldParams(id,fieldDefinition.fields);
-                if(fieldDefinition!==undefined) return fieldDefinition;
+
+//Helpers
+rz.widgets.formHelpers.getFieldParams = function(id,fieldDefinitions){
+    for(var i=0;i<fieldDefinitions.length;i++){
+        var fieldDefinition = fieldDefinitions[i];
+        if(fieldDefinition.fieldGroup){
+            var fieldDefinition = this.getFieldParams(id,fieldDefinition.fields);
+            if(fieldDefinition!==undefined) return fieldDefinition;
+        }
+        else{
+            if(fieldDefinition.id==id){
+                return fieldDefinition;
             }
-            else{
-                if(fieldDefinition.id==id){
-                    return fieldDefinition;
+        }
+    }
+};
+
+rz.widgets.formHelpers.createFieldRenderer("collection", {
+    getContentRenderer : function(params){
+        var itemsRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.itemsRenderer") ;
+        if(itemsRenderer==undefined){
+            itemsRenderer = {
+                renderer: "default-list",
+                    rendererParams: {
+                    editingText:"editing"
                 }
             }
         }
-    },
-    getContentRenderer : function(params){
-        var contentRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.renderer");
+        var contentRenderer = itemsRenderer.renderer;
         if(contentRenderer===undefined){
             return rz.widgets.formHelpers.getFieldPartRenderer("default-list","collection");
         }
@@ -385,7 +397,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         }
     },
     render: function (sb, field, containerID) {
-        sb.appendFormat('<div class="{0}">',field.maineElementCss || "ui raised secondary segment");
+        sb.appendFormat('<div class="{0}">',field.mainElementCss || "ui raised secondary segment");
         sb.appendFormat('   <div id="{0}_collection_container" class="ui {1} list collection-container">', containerID,field.collectionContainerCssClsss || "middle aligned divided");
         sb.appendFormat('   </div>');
         sb.appendFormat('</div>');
@@ -403,7 +415,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
     setValue: function (fid, newValue,sender) {
         var newElementIDS = [];
         var id = fid.substring(0,fid.lastIndexOf("_collection")); /*particular for non input controls*/
-        var fieldParams = this.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
+        var fieldParams = rz.widgets.formHelpers.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
         var sb = new StringBuilder();
         var $this = this;
         var processAddValue = function(item){
@@ -439,10 +451,12 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     $(id).dropdown({
                         action:"hide",
                         onChange:function(item){
-                            var action = $(item).data("action");
-                            var rowID = $(item).data("rowid");
+                            var $item = $(item);
+                            var action = $item.data("action");
+                            var rowID = $item.data("rowid");
+                            var fieldid = $item.data("targetfield");
                             var rowData = JSON.parse(atob($("#" + rowID).data("value")));
-                            sender.raiseEvent("collection-request-change",{action:action,rowid:rowID,rowData:rowData},sender);
+                            sender.raiseEvent("collection-request-change",{action:action,fieldid:fieldid,rowid:rowID,rowData:rowData},sender);
                         }
                     });
 
@@ -469,7 +483,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
     },
 
     bindEvents: function (id, emit, sender) {
-        var fieldParams = this.getFieldParams(id, sender.renderer.params.fields);
+        var fieldParams = rz.widgets.formHelpers.getFieldParams(id, sender.renderer.params.fields);
         var fieldsets = {
             rule:'restrict',
             fieldsets: fieldParams.itemsSource.source.split(' ')
@@ -488,10 +502,48 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             });
         }
 
+        sender.on("collection-request-change",function(sender,e){
+
+            var fieldid = e.fieldid;
+            var fieldParams = rz.widgets.formHelpers.getFieldParams(fieldid, sender.renderer.params.fields);
+            var deleteRow = function(){
+
+                $("#" + e.rowid).fadeOut("fast",function(){
+                    $("#" + e.rowid).detach();
+                });
+                //todo emit (changed)
+            };
+
+            if(e.action=="edit-item"){
+                if(fieldParams.itemsSource.type=="fieldset"){
+                    $("#" + e.fieldid + " .collection-dataitem").removeClass("edit-mode");
+                    $("#" + e.rowid).addClass("edit-mode");
+                    sender.setFormData(e.rowData,{rule:"restrict", fieldsets:fieldParams.itemsSource.source.split(' ')});
+                    //todo add edit class on row;
+                }
+                else{ //if form
+                    throw "not implemented yeeeeeet";
+                }
+            }
+            else if(e.action=="remove-item"){
+                var confirmMethod = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemActions.confirmDeleteItemMethod");
+                if(confirmMethod !==undefined  ){
+                    confirmMethod(sender,{fieldParams:fieldParams,originalEventArgs:e},function(confirm){
+                        if(confirm){
+                            deleteRow();
+                        }
+                    });
+                }
+                else{
+                    deleteRow();
+                }
+            }
+            //sender.raiseEvent(,{action:action,rowid:rowID,rowData:rowData},sender);
+        });
         //***************************************************registrar o datachange:*******************************
-    //     $("#" + id).change(function (e) {
-    //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
-    //     });
+        //     $("#" + id).change(function (e) {
+        //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
+        //     });
     },
     doPosRenderActions: function (id, $this) {}
 });
@@ -513,7 +565,13 @@ rz.widgets.formHelpers.createFieldPartRenderer("default-actions",function(sb,par
     sb.appendFormat('        <div class="menu">');
     sb.appendFormat('            <div class="header">{0}</div>',title);
     params.itemActions.actions.forEach(function(action){
-        sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}"></i> {2}</div>',action.icon,action.action,action.name,params.__uid);
+    sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}" data-targetfield="{4}"></i> {2}</div>',
+        action.icon,
+        action.action,
+        action.name,
+        params.__uid,
+        params.id
+    );
     });
     sb.appendFormat('        </div>');
     sb.appendFormat('    </div>');
@@ -529,6 +587,9 @@ rz.widgets.formHelpers.createFieldPartRenderer("default-list", function(sb,param
     else{
          text = (data!==undefined) ? data.toString():"";
     }
+    sb.appendFormat('<div class="{0} collectionitem-edition-indicator">', rz.helpers.jsonUtils.getDataAtPath(params,'itemsSource.itemsRenderer.rendererParams["editingLabelClass"]') || "ui red ribbon label");
+    sb.appendFormat('  <i class="edit icon"></i> {0}', rz.helpers.jsonUtils.getDataAtPath(params,'itemsSource.itemsRenderer.rendererParams["editingText"]') || "");
+    sb.appendFormat('</div>');
     sb.appendFormat(text);
 },'collection');
 

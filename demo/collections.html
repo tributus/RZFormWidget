@@ -21,6 +21,17 @@
         .validation-report-container {
             margin-top: 10px;
         }
+
+
+        .ui.ribbon.label.collectionitem-edition-indicator{
+            display:none;
+        }
+
+        .collection-dataitem.edit-mode .ui.ribbon.label.collectionitem-edition-indicator{
+            display: inline-block;
+        }
+
+
     </style>
 
     <script src="../bower_components/rutezangada-clientengine/dist/RZClientEngine-standalone.min.js"></script>
@@ -144,14 +155,20 @@
                 },
                 {
                     model:"Enderecos", label:"Endereços", type:"collection",id:"colend",
-                    maineElementCss:"ui raised secondary segment",
+                    mainElementCss:"ui raised secondary segment",
                     collectionContainerCssClsss:"middle aligned divided",
                     itemsSource:{
                         type:"fieldset", //"form"
                         source:"enderecos",
                         trigger:"add-to-collection",
                         displayMemberPath:"Rua", //only for default renderer
-                        renderer: "default-list" //function(sb,params,data){sb.appendFormat('<h1>{0}</h1>',data.Rua);}
+                        itemsRenderer:{
+                            renderer: "default-list", //function(sb,params,data){sb.appendFormat('<h1>{0}</h1>',data.Rua);},
+                            rendererParams: {
+                                editingText:"editando",
+                                editingLabelClass:"ui teal ribbon label"
+                            }
+                        }
                     },
                     itemActions: {
                         hideActionsMenu:false,
@@ -159,6 +176,10 @@
                         properties:{
                             title:"AçõesDD"
                         },
+//                        confirmDeleteItemMethod:function(sender, e, callback){
+//                            var result = confirm("Confirma a exclusão deste item ? ");
+//                            callback(result);
+//                        },
                         actions:[
                             {name: "Excluir item", action: "remove-item", icon: "delete"},
                             {name: "Editar item", action: "edit-item", icon: "edit"}

@@ -24,7 +24,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
      * @param {string} target
      * @param {object} params
      */
-    this.render = function (target, params) {
+    this.render = function (target, params,createDomElement) {
         $this.params = params;
         $this.target = target;
         var baseID = target+"base_form";
@@ -40,10 +40,20 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.append('  </form>');
         sb.appendFormat('<div id="{0}_validation_report" class="validation-report-container"></div>',target);
         sb.append('</div>');
-        $("#" + target).append(sb.toString());
         $this.sender.baseID = baseID;
-        rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        rz.widgets.formHelpers.bindEventHandlers($this.sender);
+
+        createDomElement({
+            target: "#" + target,
+            data:sb,
+            method: "append",
+            doAfterRenderAction:function(){
+                rz.widgets.formHelpers.doPosRenderActions($this.sender);
+                rz.widgets.formHelpers.bindEventHandlers($this.sender);
+            }
+        });
+        // $("#" + target).append(sb.toString());
+        // rz.widgets.formHelpers.doPosRenderActions($this.sender);
+        // rz.widgets.formHelpers.bindEventHandlers($this.sender);
     };
 
     var isElegibleFormTabPanel = function () {

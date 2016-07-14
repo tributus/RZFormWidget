@@ -63,8 +63,8 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    renderDataFieldByType: function (sb, field, containerID) {
-        this.fieldRenderers[field.type].render(sb, field, containerID);
+    renderDataFieldByType: function (sb, field, containerID,sender) {
+        this.fieldRenderers[field.type].render(sb, field, containerID,sender);
     },
     resolveModelName: function (field, generatedID) {
         var hasGetAndSet = (rz.widgets.formHelpers.fieldRenderers[field.type].getValue !==undefined && rz.widgets.formHelpers.fieldRenderers[field.type].setValue !==undefined);
@@ -315,57 +315,77 @@ rz.widgets.formHelpers = {
  * Created by anderson.santos on 06/07/2016.
  */
 rz.widgets.formHelpers.createFieldRenderer("actions", {
-    actionRenderers : {
-        button:function(actionData, sb,containerID){
-            sb.appendFormat('<button id="{3}_action-button" class="ui {2} button rz-action-handler" data-action="{0}">{1}</button>',
-                actionData.name,
-                actionData.label || "",
-                actionData.cssClass || "primary",
-                containerID
-            );
-        }
-    },
-    render: function (sb, field, containerID) {
-        var $this = this;
-        if(field.actions !==undefined){
-            field.actions.forEach(function(action){
-                $this.actionRenderers[action.type](action,sb,containerID);
-            });
-        }
-        return containerID + "_collection";
+    render: function (sb, field, containerID,sender) {
+        field.widgetInstance = ruteZangada.renderWidget("rz-actions-bar", "actionsBar",field.params,function(renderData,eventArgs,callback){
+            eventArgs.cancel = true;
+            sb.append(renderData.data.toString());
+            //register after numseiukê
+            sender.enqueueInnerWidgetToInitialize();
+            callback(eventArgs);
+        });
     },
     bindEvents: function (id, emit, sender) {
-            $("#" + id + " .button.rz-action-handler").click(function (e) {
-                // try{
-                    var action  = $(e.currentTarget).data("action");
-                    if(action!==undefined){
-                        emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
-                    }
-                    return false;
-                // }
-                // catch (e){
-                //     console.error(e);
-                //     return false;
-                // }
-            });
+        
     },
     doPosRenderActions: function (id, $this) {}
 
 });
+
+
+
+/********************ORIGINAL**************************/
+// rz.widgets.formHelpers.createFieldRenderer("actions", {
+//     actionRenderers : {
+//         button:function(actionData, sb,containerID){
+//             sb.appendFormat('<button id="{3}_action-button" class="ui {2} button rz-action-handler" data-action="{0}">{1}</button>',
+//                 actionData.name,
+//                 actionData.label || "",
+//                 actionData.cssClass || "primary",
+//                 containerID
+//             );
+//         }
+//     },
+//     render: function (sb, field, containerID) {
+//         var $this = this;
+//         if(field.actions !==undefined){
+//             field.actions.forEach(function(action){
+//                 $this.actionRenderers[action.type](action,sb,containerID);
+//             });
+//         }
+//         return containerID + "_collection";
+//     },
+//     bindEvents: function (id, emit, sender) {
+//         $("#" + id + " .button.rz-action-handler").click(function (e) {
+//             // try{
+//             var action  = $(e.currentTarget).data("action");
+//             if(action!==undefined){
+//                 emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
+//             }
+//             return false;
+//             // }
+//             // catch (e){
+//             //     console.error(e);
+//             //     return false;
+//             // }
+//         });
+//     },
+//     doPosRenderActions: function (id, $this) {}
+//
+// });
 /**
  * Created by anderson.santos on 06/07/2016.
  */
 
 //Helpers
-rz.widgets.formHelpers.getFieldParams = function(id,fieldDefinitions){
-    for(var i=0;i<fieldDefinitions.length;i++){
+rz.widgets.formHelpers.getFieldParams = function (id, fieldDefinitions) {
+    for (var i = 0; i < fieldDefinitions.length; i++) {
         var fieldDefinition = fieldDefinitions[i];
-        if(fieldDefinition.fieldGroup){
-            var fieldDefinition = this.getFieldParams(id,fieldDefinition.fields);
-            if(fieldDefinition!==undefined) return fieldDefinition;
+        if (fieldDefinition.fieldGroup) {
+            var fieldDefinition = this.getFieldParams(id, fieldDefinition.fields);
+            if (fieldDefinition !== undefined) return fieldDefinition;
         }
-        else{
-            if(fieldDefinition.id==id){
+        else {
+            if (fieldDefinition.id == id) {
                 return fieldDefinition;
             }
         }
@@ -373,107 +393,113 @@ rz.widgets.formHelpers.getFieldParams = function(id,fieldDefinitions){
 };
 
 rz.widgets.formHelpers.createFieldRenderer("collection", {
-    getContentRenderer : function(params){
-        var itemsRenderer = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.itemsRenderer") ;
-        if(itemsRenderer==undefined){
+    getContentRenderer: function (params) {
+        var itemsRenderer = rz.helpers.jsonUtils.getDataAtPath(params, "itemsSource.itemsRenderer");
+        if (itemsRenderer == undefined) {
             itemsRenderer = {
                 renderer: "default-list",
-                    rendererParams: {
-                    editingText:"editing"
+                rendererParams: {
+                    editingText: "editing"
                 }
             }
         }
         var contentRenderer = itemsRenderer.renderer;
-        if(contentRenderer===undefined){
-            return rz.widgets.formHelpers.getFieldPartRenderer("default-list","collection");
+        if (contentRenderer === undefined) {
+            return rz.widgets.formHelpers.getFieldPartRenderer("default-list", "collection");
         }
-        else{
-            if(typeof(contentRenderer)=="string"){
-                return rz.widgets.formHelpers.getFieldPartRenderer(contentRenderer,"collection");
+        else {
+            if (typeof(contentRenderer) == "string") {
+                return rz.widgets.formHelpers.getFieldPartRenderer(contentRenderer, "collection");
             }
-            else{
+            else {
                 return contentRenderer;
             }
         }
     },
     render: function (sb, field, containerID) {
-        sb.appendFormat('<div class="{0}">',field.mainElementCss || "ui raised secondary segment");
-        sb.appendFormat('   <div id="{0}_collection_container" class="ui {1} list collection-container">', containerID,field.collectionContainerCssClsss || "middle aligned divided");
+        sb.appendFormat('<div class="{0}">', field.mainElementCss || "ui raised secondary segment");
+        sb.appendFormat('   <div id="{0}_collection_container" class="ui {1} list collection-container">', containerID, field.collectionContainerCssClsss || "middle aligned divided");
         sb.appendFormat('   </div>');
         sb.appendFormat('</div>');
         return containerID + "_collection";
     },
     getValue: function (id) {
         var results = [];
-        id = id.substring(0,id.lastIndexOf("_collection"));
-        $(id + " .collection-dataitem").each(function(idx, item){
+        id = id.substring(0, id.lastIndexOf("_collection"));
+        $(id + " .collection-dataitem").each(function (idx, item) {
             var data = $(item).data("value");
             results.push(JSON.parse(atob(data)));
         });
         return results;
     },
-    setValue: function (fid, newValue,sender) {
+    setValue: function (fid, newValue, sender) {
         var newElementIDS = [];
-        var id = fid.substring(0,fid.lastIndexOf("_collection")); /*particular for non input controls*/
-        var fieldParams = rz.widgets.formHelpers.getFieldParams(id.replace("#",""),sender.renderer.params.fields);
+        var id = fid.substring(0, fid.lastIndexOf("_collection"));
+        /*particular for non input controls*/
+        var fieldParams = rz.widgets.formHelpers.getFieldParams(id.replace("#", ""), sender.renderer.params.fields);
         var sb = new StringBuilder();
         var $this = this;
-        var processAddValue = function(item){
-            var itemid = id.replace("#","") + rz.helpers.generateRandomID();
+        var processAddValue = function (item) {
+            var itemid = id.replace("#", "") + rz.helpers.generateRandomID();
             sb.appendFormat('       <div id="{1}" class="item collection-dataitem" data-value="{0}">',
-                (item!==undefined && item !==null)?btoa(JSON.stringify(item)):item,
+                (item !== undefined && item !== null) ? btoa(JSON.stringify(item)) : item,
                 itemid
             );
             newElementIDS.push(itemid);
             fieldParams.__uid = itemid;
-            if(!fieldParams.itemActions.hideActionsMenu){
+            if (!fieldParams.itemActions.hideActionsMenu) {
                 var actionsRenderer = fieldParams.itemActions.renderer || "default";
-                if(typeof(actionsRenderer)=="string"){
-                    actionsRenderer = rz.widgets.formHelpers.getFieldPartRenderer(actionsRenderer,"collection")
+                if (typeof(actionsRenderer) == "string") {
+                    actionsRenderer = rz.widgets.formHelpers.getFieldPartRenderer(actionsRenderer, "collection")
                 }
-                actionsRenderer(sb,fieldParams);
+                actionsRenderer(sb, fieldParams);
             }
-            sb.appendFormat('           <div class="content">');
+            sb.appendFormat('           <div class="data-area content">');
             var contentRenderer = $this.getContentRenderer(fieldParams);
-            contentRenderer(sb,fieldParams,item);
+            contentRenderer(sb, fieldParams, item);
             sb.appendFormat('           </div>');
             sb.appendFormat('       </div>');
         };
 
-        var clearCollectionData = function(){
+        var clearCollectionData = function () {
             $(fid + "_collection_container").empty();
         };
 
-        var initializeActionsDropdown = function(){
-            setTimeout(function(){
-                newElementIDS.forEach(function(item){
+        var initializeActionsDropdown = function () {
+            setTimeout(function () {
+                newElementIDS.forEach(function (item) {
                     var id = "#" + item + " .ui.dropdown";
                     $(id).dropdown({
-                        action:"hide",
-                        onChange:function(item){
+                        action: "hide",
+                        onChange: function (item) {
                             var $item = $(item);
                             var action = $item.data("action");
                             var rowID = $item.data("rowid");
                             var fieldid = $item.data("targetfield");
                             var rowData = JSON.parse(atob($("#" + rowID).data("value")));
-                            sender.raiseEvent("collection-request-change",{action:action,fieldid:fieldid,rowid:rowID,rowData:rowData},sender);
+                            sender.raiseEvent("collection-request-change", {
+                                action: action,
+                                fieldid: fieldid,
+                                rowid: rowID,
+                                rowData: rowData
+                            }, sender);
                         }
                     });
 
                 });
                 newElementIDS = [];
-            },100);
+            }, 100);
         };
 
-        if(newValue !==undefined && typeof(newValue)==="object" && newValue.length !== undefined){
-            newValue.forEach(function(item){
+        if (newValue !== undefined && newValue != null && typeof(newValue) === "object" && newValue.length !== undefined) {
+            newValue.forEach(function (item) {
                 processAddValue(item);
             });
         }
-        else if(newValue===undefined || newValue===null){
+        else if (newValue === undefined || newValue === null) {
             clearCollectionData();
         }
-        else{
+        else {
             processAddValue(newValue);
         }
 
@@ -484,57 +510,102 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
     bindEvents: function (id, emit, sender) {
         var fieldParams = rz.widgets.formHelpers.getFieldParams(id, sender.renderer.params.fields);
+        var source = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemsSource.type") || "fieldset";
         var fieldsets = {
-            rule:'restrict',
+            rule: 'restrict',
             fieldsets: fieldParams.itemsSource.source.split(' ')
         };
 
-        if(fieldParams.itemsSource.type=="fieldset"){
-            sender.on(fieldParams.itemsSource.trigger,function(sender){
-                sender.validateForm(function(sender,result){
-                    if(result.validated){
+        sender.on(fieldParams.itemsSource.addToCollectiontrigger, function (sender) {
+            if (source=="fieldset") {
+                sender.validateForm(function (sender, result) {
+                    if (result.validated) {
                         var newItem = sender.getFormData(fieldsets);
                         sender.clearFormData(fieldsets);
-                        sender.setValueOf(id,newItem);
+                        sender.setValueOf(id, newItem);
                         //emit aqui ? ou lá?
                     }
-                },fieldsets);
-            });
-        }
+                }, fieldsets);
+            }
+            else if(source=="xxxxxxxxxxx"){
+                throw "NOT_IMPLEMENTED";
+            }
+        });
+        
+        sender.on(fieldParams.itemsSource.clearCollectionTrigger,function(sender){
+            var confirmMethod = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemsSource.confirmClearMethod");
+            if(confirmMethod !==undefined){
+                confirmMethod(sender,{params:fieldParams},function(confirm){
+                    if(confirm){
+                        sender.setValueOf(fieldParams.id,null,sender);
+                    }
+                });
+            }
+            else{
+                sender.setValueOf(fieldParams.id,null,sender);
+            }
+        });
 
-        sender.on("collection-request-change",function(sender,e){
+        sender.on(fieldParams.itemsSource.updateCollectionTrigger,function(sender){
+            if (source=="fieldset") {
+                sender.validateForm(function (sender, result) {
+                    if (result.validated) {
+                        var newItem = sender.getFormData(fieldsets);
+                        sender.clearFormData(fieldsets);
+                        //sender.setValueOf(id, newItem);
+                        var el = $("#" + fieldParams.id + " .edit-mode");
+                        el.data("value",btoa(JSON.stringify(newItem)));
+                        el.removeClass("edit-mode");
+                        var contentRenderer = rz.widgets.formHelpers.fieldRenderers["collection"].getContentRenderer(fieldParams);
+                        var sb = new StringBuilder();
+                        contentRenderer(sb,fieldParams,newItem,"edit-mode");
+                        el.find(".data-area").html(sb.toString());
 
+                        //emit aqui ? ou lá?
+                    }
+                }, fieldsets);
+            }
+            else if(source=="xxxxxxxxxxx"){
+                throw "NOT_IMPLEMENTED";
+            }
+        });
+
+
+        sender.on("collection-request-change", function (sender, e) {
             var fieldid = e.fieldid;
             var fieldParams = rz.widgets.formHelpers.getFieldParams(fieldid, sender.renderer.params.fields);
-            var deleteRow = function(){
+            var deleteRow = function () {
 
-                $("#" + e.rowid).fadeOut("fast",function(){
+                $("#" + e.rowid).fadeOut("fast", function () {
                     $("#" + e.rowid).detach();
                 });
                 //todo emit (changed)
             };
 
-            if(e.action=="edit-item"){
-                if(fieldParams.itemsSource.type=="fieldset"){
+            if (e.action == "edit-item") {
+                if (fieldParams.itemsSource.type == "fieldset") {
                     $("#" + e.fieldid + " .collection-dataitem").removeClass("edit-mode");
                     $("#" + e.rowid).addClass("edit-mode");
-                    sender.setFormData(e.rowData,{rule:"restrict", fieldsets:fieldParams.itemsSource.source.split(' ')});
+                    sender.setFormData(e.rowData, {
+                        rule: "restrict",
+                        fieldsets: fieldParams.itemsSource.source.split(' ')
+                    });
                     //todo add edit class on row;
                 }
-                else{ //if form
+                else { //if form
                     throw "not implemented yeeeeeet";
                 }
             }
-            else if(e.action=="remove-item"){
-                var confirmMethod = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemActions.confirmDeleteItemMethod");
-                if(confirmMethod !==undefined  ){
-                    confirmMethod(sender,{fieldParams:fieldParams,originalEventArgs:e},function(confirm){
-                        if(confirm){
+            else if (e.action == "remove-item") {
+                var confirmMethod = rz.helpers.jsonUtils.getDataAtPath(fieldParams, "itemActions.confirmDeleteItemMethod");
+                if (confirmMethod !== undefined) {
+                    confirmMethod(sender, {fieldParams: fieldParams, originalEventArgs: e}, function (confirm) {
+                        if (confirm) {
                             deleteRow();
                         }
                     });
                 }
-                else{
+                else {
                     deleteRow();
                 }
             }
@@ -545,53 +616,54 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
         //     });
     },
-    doPosRenderActions: function (id, $this) {}
+    doPosRenderActions: function (id, $this) {
+    }
 });
-rz.widgets.formHelpers.createFieldPartRenderer("default-actions",function(sb,params){
-    var ensureActions = function(){
-        if(params.itemActions === undefined) params.itemActions = {};
-        if(params.itemActions.actions === undefined){
+rz.widgets.formHelpers.createFieldPartRenderer("default-actions", function (sb, params) {
+    var ensureActions = function () {
+        if (params.itemActions === undefined) params.itemActions = {};
+        if (params.itemActions.actions === undefined) {
             params.itemActions.actions = [
                 {name: "Delete item", action: "remove-item", icon: "delete"},
                 {name: "Edit item", action: "edit-item", icon: "edit"}
             ]
         }
     };
-    var title = rz.helpers.jsonUtils.getDataAtPath(params,"itemActions.properties.title") || "Actions";
+    var title = rz.helpers.jsonUtils.getDataAtPath(params, "itemActions.properties.title") || "Actions";
     ensureActions();
     sb.appendFormat('<div class="right floated content">');
     sb.appendFormat('    <div class="ui icon top right pointing dropdown button">');
     sb.appendFormat('        <i class="ellipsis vertical icon"></i>');
     sb.appendFormat('        <div class="menu">');
-    sb.appendFormat('            <div class="header">{0}</div>',title);
-    params.itemActions.actions.forEach(function(action){
-    sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}" data-targetfield="{4}"></i> {2}</div>',
-        action.icon,
-        action.action,
-        action.name,
-        params.__uid,
-        params.id
-    );
+    sb.appendFormat('            <div class="header">{0}</div>', title);
+    params.itemActions.actions.forEach(function (action) {
+        sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}" data-targetfield="{4}"></i> {2}</div>',
+            action.icon,
+            action.action,
+            action.name,
+            params.__uid,
+            params.id
+        );
     });
     sb.appendFormat('        </div>');
     sb.appendFormat('    </div>');
     sb.appendFormat('</div>');
-},"collection");
+}, "collection");
 
-rz.widgets.formHelpers.createFieldPartRenderer("default-list", function(sb,params,data){
-    var dmp = rz.helpers.jsonUtils.getDataAtPath(params,"itemsSource.displayMemberPath");
-    var  text = "";
-    if(  dmp !==undefined){
-        text = (data!==undefined) ? rz.helpers.jsonUtils.getDataAtPath(data, dmp):"";
+rz.widgets.formHelpers.createFieldPartRenderer("default-list", function (sb, params, data) {
+    var dmp = rz.helpers.jsonUtils.getDataAtPath(params, "itemsSource.displayMemberPath");
+    var text = "";
+    if (dmp !== undefined) {
+        text = (data !== undefined) ? rz.helpers.jsonUtils.getDataAtPath(data, dmp) : "";
     }
-    else{
-         text = (data!==undefined) ? data.toString():"";
+    else {
+        text = (data !== undefined) ? data.toString() : "";
     }
-    sb.appendFormat('<div class="{0} collectionitem-edition-indicator">', rz.helpers.jsonUtils.getDataAtPath(params,'itemsSource.itemsRenderer.rendererParams["editingLabelClass"]') || "ui red ribbon label");
-    sb.appendFormat('  <i class="edit icon"></i> {0}', rz.helpers.jsonUtils.getDataAtPath(params,'itemsSource.itemsRenderer.rendererParams["editingText"]') || "");
+    sb.appendFormat('<div class="{0} collectionitem-edition-indicator">', rz.helpers.jsonUtils.getDataAtPath(params, 'itemsSource.itemsRenderer.rendererParams["editingLabelClass"]') || "ui red ribbon label");
+    sb.appendFormat('  <i class="edit icon"></i> {0}', rz.helpers.jsonUtils.getDataAtPath(params, 'itemsSource.itemsRenderer.rendererParams["editingText"]') || "");
     sb.appendFormat('</div>');
     sb.appendFormat(text);
-},'collection');
+}, 'collection');
 
 /**
  * Created by Anderson on 13/01/2016.
@@ -747,7 +819,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
      * @param {string} target
      * @param {object} params
      */
-    this.render = function (target, params) {
+    this.render = function (target, params,createDomElement) {
         $this.params = params;
         $this.target = target;
         var baseID = target+"base_form";
@@ -763,10 +835,20 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.append('  </form>');
         sb.appendFormat('<div id="{0}_validation_report" class="validation-report-container"></div>',target);
         sb.append('</div>');
-        $("#" + target).append(sb.toString());
         $this.sender.baseID = baseID;
-        rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        rz.widgets.formHelpers.bindEventHandlers($this.sender);
+
+        createDomElement({
+            target: "#" + target,
+            data:sb,
+            method: "append",
+            doAfterRenderAction:function(){
+                rz.widgets.formHelpers.doPosRenderActions($this.sender);
+                rz.widgets.formHelpers.bindEventHandlers($this.sender);
+            }
+        });
+        // $("#" + target).append(sb.toString());
+        // rz.widgets.formHelpers.doPosRenderActions($this.sender);
+        // rz.widgets.formHelpers.bindEventHandlers($this.sender);
     };
 
     var isElegibleFormTabPanel = function () {
@@ -860,24 +942,26 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var h = $this.params.horizontal;
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
-            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6}">',
+            sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6} {7}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
                 (h)? "inline fields":"field",
                 (field.wide !==undefined)? " " + field.wide + " wide":"",
-                rz.widgets.formHelpers.resolveFieldSet(field)
+                rz.widgets.formHelpers.resolveFieldSet(field),
+                field.containerCssClass || ""
 
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             if(h) sb.appendFormat('<div class="sixteen wide field">');
 
-            if(field.label !==undefined){
-                sb.appendFormat('<label for="{1}" class="{2}">{0}</label>',
-                    field.label,
+            if(field.label !==undefined || field.preserveLabelOffset){
+                sb.appendFormat('<label for="{1}" class="{2} {3}">{0}</label>',
+                    field.label || "&nbsp;",
                     inputID,
-                    "control-label"
+                    "control-label",
+                    field.labelCssClass || ""
                 );
             }
 
@@ -1039,12 +1123,13 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
 
-            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field field{4}">',
+            sb.appendFormat('<td id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" class="row-form-field field{4} {5}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
-                rz.widgets.formHelpers.resolveFieldSet(field)
+                rz.widgets.formHelpers.resolveFieldSet(field),
+                field.containerCssClass || ""
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
@@ -1257,16 +1342,17 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
 
-            sb.appendFormat('<tr id="{0}" data-fieldtype="{1}" data-model="{2}" data-initial-value="{3}" {4} class="field field-row{5}">',
+            sb.appendFormat('<tr id="{0}" data-fieldtype="{1}" data-model="{2}" {3} {4} class="field field-row{5} {6}">',
                 field.id,
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
                 gidata || "",
-                rz.widgets.formHelpers.resolveFieldSet(field)
+                rz.widgets.formHelpers.resolveFieldSet(field),
+                field.containerCssClass || ""
             );
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
-            sb.appendFormat('<td><label for="{1}">{0}</label></td>', field.label, inputID);
+            sb.appendFormat('<td><label for="{1}" class="{2}">{0}</label></td>', field.label||"&nbsp;", inputID,field.labelCssClass||"");
             sb.appendFormat('<td>');
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
             sb.append('</td>');
@@ -1510,8 +1596,8 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         }
     };
 
-    this.render = function (target, params) {
-        $this.renderer.render(target, params);
+    this.render = function (target, params,createDomElement) {
+        $this.renderer.render(target, params,createDomElement);
     };
 
     this.fieldCount = function () {

@@ -16,7 +16,6 @@
     <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-segment/segment.min.css">
     <link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui-message/message.min.css">
 
-
     <style id="demo-only-style">
         .validation-report-container {
             margin-top: 10px;
@@ -35,6 +34,7 @@
     </style>
 
     <script src="../bower_components/rutezangada-clientengine/dist/RZClientEngine-standalone.min.js"></script>
+    <script src="../bower_components/rutezangada-actionsbarwidget/dist/RZActionsBarWidget.js"></script>
     <script src="../bower_components/semantic-ui-form/form.min.js"></script>
     <script src="../bower_components/semantic-ui-tab/tab.min.js"></script>
     <script src="../bower_components/semantic-ui-accordion/accordion.min.js"></script>
@@ -149,12 +149,25 @@
                 {model: "Cidade", label: "Cidade", type: "text", id: "cidade", fieldSetName:"enderecos"},
                 {
                     type: "actions",
-                    actions:[
-                        {type:"button", name:"add-to-collection",label:"adicionar",cssClass:"primary"},
-                        {type:"button", name:"update-into-collection",label:"atualizar",cssClass:"primary"},
-                        {type:"button", name:"clear-collection",label:"limpar",cssClass:"secondary"}
+                    params:{
+                    ui:{
+                        rootElementClass:"ui right aligned flat segment"
+                    },
+                    items:[
+                        {text:"cancelar",action:"cancel", cssClass:"secondary", renderTag:"button"},
+                        {text:"salvar",action:"save",cssClass:"primary",renderTag:"button"}
                     ]
+                }
                 },
+//***ORIGINAL*******//
+//                {
+//                    type: "actions",
+//                    actions:[
+//                        {type:"button", name:"add-to-collection",label:"adicionar",cssClass:"primary"},
+//                        {type:"button", name:"update-into-collection",label:"atualizar",cssClass:"primary"},
+//                        {type:"button", name:"clear-collection",label:"limpar",cssClass:"secondary"}
+//                    ]
+//                },
                 {
                     model:"Enderecos", label:"Endereços", type:"collection",id:"colend",
                     mainElementCss:"ui raised secondary segment",

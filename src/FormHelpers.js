@@ -12,8 +12,8 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    renderDataFieldByType: function (sb, field, containerID) {
-        this.fieldRenderers[field.type].render(sb, field, containerID);
+    renderDataFieldByType: function (sb, field, containerID,sender) {
+        this.fieldRenderers[field.type].render(sb, field, containerID,sender);
     },
     resolveModelName: function (field, generatedID) {
         var hasGetAndSet = (rz.widgets.formHelpers.fieldRenderers[field.type].getValue !==undefined && rz.widgets.formHelpers.fieldRenderers[field.type].setValue !==undefined);

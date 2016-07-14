@@ -22,8 +22,8 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         }
     };
 
-    this.render = function (target, params) {
-        $this.renderer.render(target, params);
+    this.render = function (target, params,createDomElement) {
+        $this.renderer.render(target, params,createDomElement);
     };
 
     this.fieldCount = function () {

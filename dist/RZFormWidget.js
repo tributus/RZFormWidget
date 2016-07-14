@@ -63,8 +63,8 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    renderDataFieldByType: function (sb, field, containerID) {
-        this.fieldRenderers[field.type].render(sb, field, containerID);
+    renderDataFieldByType: function (sb, field, containerID,sender) {
+        this.fieldRenderers[field.type].render(sb, field, containerID,sender);
     },
     resolveModelName: function (field, generatedID) {
         var hasGetAndSet = (rz.widgets.formHelpers.fieldRenderers[field.type].getValue !==undefined && rz.widgets.formHelpers.fieldRenderers[field.type].setValue !==undefined);
@@ -315,43 +315,63 @@ rz.widgets.formHelpers = {
  * Created by anderson.santos on 06/07/2016.
  */
 rz.widgets.formHelpers.createFieldRenderer("actions", {
-    actionRenderers : {
-        button:function(actionData, sb,containerID){
-            sb.appendFormat('<button id="{3}_action-button" class="ui {2} button rz-action-handler" data-action="{0}">{1}</button>',
-                actionData.name,
-                actionData.label || "",
-                actionData.cssClass || "primary",
-                containerID
-            );
-        }
-    },
-    render: function (sb, field, containerID) {
-        var $this = this;
-        if(field.actions !==undefined){
-            field.actions.forEach(function(action){
-                $this.actionRenderers[action.type](action,sb,containerID);
-            });
-        }
-        return containerID + "_collection";
+    render: function (sb, field, containerID,sender) {
+        field.widgetInstance = ruteZangada.renderWidget("rz-actions-bar", "actionsBar",field.params,function(renderData,eventArgs,callback){
+            eventArgs.cancel = true;
+            sb.append(renderData.data.toString());
+            //register after numseiukê
+            sender.enqueueInnerWidgetToInitialize();
+            callback(eventArgs);
+        });
     },
     bindEvents: function (id, emit, sender) {
-            $("#" + id + " .button.rz-action-handler").click(function (e) {
-                // try{
-                    var action  = $(e.currentTarget).data("action");
-                    if(action!==undefined){
-                        emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
-                    }
-                    return false;
-                // }
-                // catch (e){
-                //     console.error(e);
-                //     return false;
-                // }
-            });
+        
     },
     doPosRenderActions: function (id, $this) {}
 
 });
+
+
+
+/********************ORIGINAL**************************/
+// rz.widgets.formHelpers.createFieldRenderer("actions", {
+//     actionRenderers : {
+//         button:function(actionData, sb,containerID){
+//             sb.appendFormat('<button id="{3}_action-button" class="ui {2} button rz-action-handler" data-action="{0}">{1}</button>',
+//                 actionData.name,
+//                 actionData.label || "",
+//                 actionData.cssClass || "primary",
+//                 containerID
+//             );
+//         }
+//     },
+//     render: function (sb, field, containerID) {
+//         var $this = this;
+//         if(field.actions !==undefined){
+//             field.actions.forEach(function(action){
+//                 $this.actionRenderers[action.type](action,sb,containerID);
+//             });
+//         }
+//         return containerID + "_collection";
+//     },
+//     bindEvents: function (id, emit, sender) {
+//         $("#" + id + " .button.rz-action-handler").click(function (e) {
+//             // try{
+//             var action  = $(e.currentTarget).data("action");
+//             if(action!==undefined){
+//                 emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
+//             }
+//             return false;
+//             // }
+//             // catch (e){
+//             //     console.error(e);
+//             //     return false;
+//             // }
+//         });
+//     },
+//     doPosRenderActions: function (id, $this) {}
+//
+// });
 /**
  * Created by anderson.santos on 06/07/2016.
  */
@@ -434,7 +454,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 }
                 actionsRenderer(sb, fieldParams);
             }
-            sb.appendFormat('           <div class="content">');
+            sb.appendFormat('           <div class="data-area content">');
             var contentRenderer = $this.getContentRenderer(fieldParams);
             contentRenderer(sb, fieldParams, item);
             sb.appendFormat('           </div>');
@@ -471,7 +491,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             }, 100);
         };
 
-        if (newValue !== undefined && typeof(newValue) === "object" && newValue.length !== undefined) {
+        if (newValue !== undefined && newValue != null && typeof(newValue) === "object" && newValue.length !== undefined) {
             newValue.forEach(function (item) {
                 processAddValue(item);
             });
@@ -511,11 +531,47 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 throw "NOT_IMPLEMENTED";
             }
         });
+        
+        sender.on(fieldParams.itemsSource.clearCollectionTrigger,function(sender){
+            var confirmMethod = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemsSource.confirmClearMethod");
+            if(confirmMethod !==undefined){
+                confirmMethod(sender,{params:fieldParams},function(confirm){
+                    if(confirm){
+                        sender.setValueOf(fieldParams.id,null,sender);
+                    }
+                });
+            }
+            else{
+                sender.setValueOf(fieldParams.id,null,sender);
+            }
+        });
 
+        sender.on(fieldParams.itemsSource.updateCollectionTrigger,function(sender){
+            if (source=="fieldset") {
+                sender.validateForm(function (sender, result) {
+                    if (result.validated) {
+                        var newItem = sender.getFormData(fieldsets);
+                        sender.clearFormData(fieldsets);
+                        //sender.setValueOf(id, newItem);
+                        var el = $("#" + fieldParams.id + " .edit-mode");
+                        el.data("value",btoa(JSON.stringify(newItem)));
+                        el.removeClass("edit-mode");
+                        var contentRenderer = rz.widgets.formHelpers.fieldRenderers["collection"].getContentRenderer(fieldParams);
+                        var sb = new StringBuilder();
+                        contentRenderer(sb,fieldParams,newItem,"edit-mode");
+                        el.find(".data-area").html(sb.toString());
+
+                        //emit aqui ? ou lá?
+                    }
+                }, fieldsets);
+            }
+            else if(source=="xxxxxxxxxxx"){
+                throw "NOT_IMPLEMENTED";
+            }
+        });
 
 
         sender.on("collection-request-change", function (sender, e) {
-
             var fieldid = e.fieldid;
             var fieldParams = rz.widgets.formHelpers.getFieldParams(fieldid, sender.renderer.params.fields);
             var deleteRow = function () {
@@ -763,7 +819,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
      * @param {string} target
      * @param {object} params
      */
-    this.render = function (target, params) {
+    this.render = function (target, params,createDomElement) {
         $this.params = params;
         $this.target = target;
         var baseID = target+"base_form";
@@ -779,10 +835,20 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.append('  </form>');
         sb.appendFormat('<div id="{0}_validation_report" class="validation-report-container"></div>',target);
         sb.append('</div>');
-        $("#" + target).append(sb.toString());
         $this.sender.baseID = baseID;
-        rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        rz.widgets.formHelpers.bindEventHandlers($this.sender);
+
+        createDomElement({
+            target: "#" + target,
+            data:sb,
+            method: "append",
+            doAfterRenderAction:function(){
+                rz.widgets.formHelpers.doPosRenderActions($this.sender);
+                rz.widgets.formHelpers.bindEventHandlers($this.sender);
+            }
+        });
+        // $("#" + target).append(sb.toString());
+        // rz.widgets.formHelpers.doPosRenderActions($this.sender);
+        // rz.widgets.formHelpers.bindEventHandlers($this.sender);
     };
 
     var isElegibleFormTabPanel = function () {
@@ -1530,8 +1596,8 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         }
     };
 
-    this.render = function (target, params) {
-        $this.renderer.render(target, params);
+    this.render = function (target, params,createDomElement) {
+        $this.renderer.render(target, params,createDomElement);
     };
 
     this.fieldCount = function () {

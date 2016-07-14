@@ -80,7 +80,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 }
                 actionsRenderer(sb, fieldParams);
             }
-            sb.appendFormat('           <div class="content">');
+            sb.appendFormat('           <div class="data-area content">');
             var contentRenderer = $this.getContentRenderer(fieldParams);
             contentRenderer(sb, fieldParams, item);
             sb.appendFormat('           </div>');
@@ -117,7 +117,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             }, 100);
         };
 
-        if (newValue !== undefined && typeof(newValue) === "object" && newValue.length !== undefined) {
+        if (newValue !== undefined && newValue != null && typeof(newValue) === "object" && newValue.length !== undefined) {
             newValue.forEach(function (item) {
                 processAddValue(item);
             });
@@ -157,11 +157,47 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 throw "NOT_IMPLEMENTED";
             }
         });
+        
+        sender.on(fieldParams.itemsSource.clearCollectionTrigger,function(sender){
+            var confirmMethod = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemsSource.confirmClearMethod");
+            if(confirmMethod !==undefined){
+                confirmMethod(sender,{params:fieldParams},function(confirm){
+                    if(confirm){
+                        sender.setValueOf(fieldParams.id,null,sender);
+                    }
+                });
+            }
+            else{
+                sender.setValueOf(fieldParams.id,null,sender);
+            }
+        });
 
+        sender.on(fieldParams.itemsSource.updateCollectionTrigger,function(sender){
+            if (source=="fieldset") {
+                sender.validateForm(function (sender, result) {
+                    if (result.validated) {
+                        var newItem = sender.getFormData(fieldsets);
+                        sender.clearFormData(fieldsets);
+                        //sender.setValueOf(id, newItem);
+                        var el = $("#" + fieldParams.id + " .edit-mode");
+                        el.data("value",btoa(JSON.stringify(newItem)));
+                        el.removeClass("edit-mode");
+                        var contentRenderer = rz.widgets.formHelpers.fieldRenderers["collection"].getContentRenderer(fieldParams);
+                        var sb = new StringBuilder();
+                        contentRenderer(sb,fieldParams,newItem,"edit-mode");
+                        el.find(".data-area").html(sb.toString());
+
+                        //emit aqui ? ou lá?
+                    }
+                }, fieldsets);
+            }
+            else if(source=="xxxxxxxxxxx"){
+                throw "NOT_IMPLEMENTED";
+            }
+        });
 
 
         sender.on("collection-request-change", function (sender, e) {
-
             var fieldid = e.fieldid;
             var fieldParams = rz.widgets.formHelpers.getFieldParams(fieldid, sender.renderer.params.fields);
             var deleteRow = function () {

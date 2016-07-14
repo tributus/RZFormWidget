@@ -166,6 +166,10 @@
                         updateCollectionTrigger:"update-into-collection",
                         clearCollectionTrigger:"clear-collection",
                         displayMemberPath:"Rua", //only for default renderer
+                        confirmClearMethod:function(sender,e,callback){
+                            var result = confirm("Confirma a exclusão deste item ? ");
+                            callback(result);
+                        },
                         itemsRenderer:{
                             renderer: "default-list", //function(sb,params,data){sb.appendFormat('<h1>{0}</h1>',data.Rua);},
                             rendererParams: {

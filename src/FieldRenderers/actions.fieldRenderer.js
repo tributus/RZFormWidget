@@ -6,7 +6,6 @@ rz.widgets.formHelpers.createFieldRenderer("actions", {
         field.widgetInstance = ruteZangada.renderWidget("rz-actions-bar", "actionsBar",field.params,function(renderData,eventArgs,callback){
             eventArgs.cancel = true;
             sb.append(renderData.data.toString());
-            //register after numseiukê
             sender.sender.innerWidgetInitializeData.push(renderData);
             callback(eventArgs);
         });

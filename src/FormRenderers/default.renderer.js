@@ -157,7 +157,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
                 field.type,
                 rz.widgets.formHelpers.resolveModelName(field, fieldID),
                 rz.widgets.formHelpers.getInitialValueData(field),
-                (h)? "inline fields":"field",
+                (h)? "inline fields field":"field",
                 (field.wide !==undefined)? " " + field.wide + " wide":"",
                 rz.widgets.formHelpers.resolveFieldSet(field),
                 field.containerCssClass || ""
@@ -183,19 +183,19 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
     };
 
-    this.fieldCount = function () {
-        return $("#" + $this.target + "base_form .form-row").length;
-    };
+    // this.fieldCount = function () {
+    //     return $("#" + $this.target + "base_form .form-row").length;
+    // };
 
-    this.getFieldIdAt = function (position) {
-        var p = position;
-        if (p >= 0 && p < this.fieldCount()) {
-            return $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
-        }
-        else {
-            return undefined;
-        }
-    };
+    // this.getFieldIdAt = function (position) {
+    //     var p = position;
+    //     if (p >= 0 && p < this.fieldCount()) {
+    //         return $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
+    //     }
+    //     else {
+    //         return undefined;
+    //     }
+    // };
 
     this.addField = function (fielddata) {
         var sb = new StringBuilder();
@@ -256,13 +256,15 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     this.setValueOf = function (fieldid, value) {
-        if (!fieldid.startsWith($this.target + "_")) {
-            fieldid = $this.target + "_" + fieldid;
-        }
-        var formerValue = rz.widgets.formHelpers.getValueOfField("#" + fieldid);
-        if (formerValue != value) {
-            rz.widgets.formHelpers.setValueOfField("#" + fieldid, value,$this.sender);
-            rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
+        if(fieldid !==undefined){
+            if (!fieldid.startsWith($this.target + "_")) {
+                fieldid = $this.target + "_" + fieldid;
+            }
+            var formerValue = rz.widgets.formHelpers.getValueOfField("#" + fieldid);
+            if (formerValue != value) {
+                rz.widgets.formHelpers.setValueOfField("#" + fieldid, value,$this.sender);
+                rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
+            }
         }
     };
 

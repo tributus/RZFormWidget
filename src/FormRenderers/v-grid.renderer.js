@@ -207,11 +207,13 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
     };
 
     this.setValueOf = function (fieldid, value) {
-        if (!fieldid.startsWith($this.target + "_")) {
-            fieldid = $this.target + "_" + fieldid;
+        if(fieldid !==undefined){
+            if (!fieldid.startsWith($this.target + "_")) {
+                fieldid = $this.target + "_" + fieldid;
+            }
+            rz.widgets.formHelpers.setValueOfField("#" + fieldid, value,$this.sender);
+            rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
         }
-        rz.widgets.formHelpers.setValueOfField("#" + fieldid, value,$this.sender);
-        rz.widgets.formHelpers.emit("data-changed", {fieldid: fieldid, value: value, src: "code"}, $this.sender);
     };
 
     this.getFormData = function (fieldsetRule) {

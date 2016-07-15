@@ -258,12 +258,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     deleteRow();
                 }
             }
-            //sender.raiseEvent(,{action:action,rowid:rowID,rowData:rowData},sender);
         });
-        //***************************************************registrar o datachange:*******************************
-        //     $("#" + id).change(function (e) {
-        //         emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
-        //     });
     },
     doPosRenderActions: function (id, $this) {
     }

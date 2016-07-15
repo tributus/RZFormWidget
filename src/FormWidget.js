@@ -1,7 +1,8 @@
 /**
  * Created by Anderson on 12/01/2016.
+ * FormWidget.js
  */
-rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers.FormWidgetInterface,rz.widgets.RZFormWidgetHelpers.FormWidgetEventHandlers,function () {
+rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelpers.FormWidgetInterface, rz.widgets.RZFormWidgetHelpers.FormWidgetEventHandlers, function () {
     var $this = this;
     this.validationReport = [];
     this.innerWidgetInitializeData = [];
@@ -17,49 +18,61 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         initialized($this.renderer.params);
     };
 
-    this.render = function (target, params,createDomElement) {
-        $this.renderer.render(target, params,createDomElement);
+    this.render = function (target, params, createDomElement) {
+        $this.renderer.render(target, params, createDomElement);
     };
 
-    var updateValidationStatus = function(){
-        if($this.isFormInvalid){
+    var updateValidationStatus = function () {
+        if ($this.isFormInvalid) {
             $this.validateForm(undefined, $this.lastFieldsetRules);
         }
     };
 
     var impl = {
-        getValueOfModel : function (model) {
-            return $this.getValueOf($this.getfieldIdOfModel(model));
-        },
-        getfieldIdOfModel : function(model){
-            return $("#" + $this.renderer.target + "base_form .field[data-model='"+model+"']").attr("id");
-        }
-    };
+            getValueOfModel: function (model) {
+                return $this.getValueOf($this.getfieldIdOfModel(model));
+            },
+            getfieldIdOfModel: function (model) {
+                return $("#" + $this.renderer.target + "base_form .field[data-model='" + model + "']").attr("id");
+            },
+            fieldCount: function () {
+                return $("#" + $this.renderer.target + "base_form .form-row").length;
+            },
+            getFieldIdAt: function (position) {
+                var p = position;
+                if (p >= 0 && p < $this.fieldCount()) {
+                    return $("#" + $this.renderer.target + "base_form .form-row").eq(p).attr("id");
+                }
+                else {
+                    return undefined;
+                }
+            }
+        };
 
-    var ensureHandler = function(n){
-        return $this.renderer[n] ||  impl[n];
+    var ensureHandler = function (n) {
+        return $this.renderer[n] || impl[n];
     };
 
     this.fieldCount = function () {
-        return $this.renderer.fieldCount();
+        return ensureHandler("fieldCount")();
     };
 
     this.getFieldIdAt = function (position) {
-        return $this.renderer.getFieldIdAt(position);
+        return ensureHandler("getFieldIdAt")(position);
     };
 
     this.addField = function (fielddata) {
         $this.renderer.addField(fielddata);
-        rz.widgets.formHelpers.bindEventHandlersOfField(fielddata.type,fielddata.id,$this);
-        rz.widgets.formHelpers.doPosRenderActionsOfField(fielddata.type,fielddata.id,$this);
-        $this.raiseEvent("field-added",fielddata,$this);
+        rz.widgets.formHelpers.bindEventHandlersOfField(fielddata.type, fielddata.id, $this);
+        rz.widgets.formHelpers.doPosRenderActionsOfField(fielddata.type, fielddata.id, $this);
+        $this.raiseEvent("field-added", fielddata, $this);
 
     };
 
     this.insertField = function (fielddata, position) {
         $this.renderer.insertField(fielddata, position);
-        rz.widgets.formHelpers.bindEventHandlersOfField(fielddata.type,fielddata.id,$this);
-        rz.widgets.formHelpers.doPosRenderActionsOfField(fielddata.type,fielddata.id,$this);
+        rz.widgets.formHelpers.bindEventHandlersOfField(fielddata.type, fielddata.id, $this);
+        rz.widgets.formHelpers.doPosRenderActionsOfField(fielddata.type, fielddata.id, $this);
     };
 
     this.removeFieldAt = function (position) {
@@ -90,7 +103,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
      * get a fieldid of field model(refatorado padrão 1)
      * @param model
      */
-    this.getfieldIdOfModel = function(model){
+    this.getfieldIdOfModel = function (model) {
         return ensureHandler("getfieldIdOfModel")(model);
     };
 
@@ -102,54 +115,54 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         return ensureHandler("getValueOfModel")(model);
     };
 
-    this.setValueOfModel = function (model,value) {
-        return $this.renderer.setValueOfModel(model,value);
+    this.setValueOfModel = function (model, value) {
+        return $this.renderer.setValueOfModel(model, value);
     };
 
     this.getFormData = function (fieldsetRule) {
         return $this.renderer.getFormData(fieldsetRule);
     };
-    
-    this.setFormData = function(formData,fieldsetRule){
+
+    this.setFormData = function (formData, fieldsetRule) {
         $this.lastFieldsetRules = fieldsetRule;
-        $this.renderer.setFormData(formData,fieldsetRule);
+        $this.renderer.setFormData(formData, fieldsetRule);
     };
 
-    this.clearFormData = function (fieldsetRule,preserveValidationStatus) {
-        if(!preserveValidationStatus){
-            $this.renderer.validateForm(undefined,undefined,true);
+    this.clearFormData = function (fieldsetRule, preserveValidationStatus) {
+        if (!preserveValidationStatus) {
+            $this.renderer.validateForm(undefined, undefined, true);
         }
         $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.clearFormData(fieldsetRule);
     };
 
-    this.validateForm = function(validationResultHandler,fieldsetRule){
+    this.validateForm = function (validationResultHandler, fieldsetRule) {
         $this.lastFieldsetRules = fieldsetRule;
-        $this.renderer.validateForm(validationResultHandler,fieldsetRule)
+        $this.renderer.validateForm(validationResultHandler, fieldsetRule)
     };
 
-    this.getFieldParams = function(filterValue,filterBy){
+    this.getFieldParams = function (filterValue, filterBy) {
         //filterBy = id,model,position
         var handler = $this.renderer.getFieldParams;
-        if(handler !==undefined){
-            return handler(filterValue,filterBy);
+        if (handler !== undefined) {
+            return handler(filterValue, filterBy);
         }
-        else{
+        else {
             //defaultHandler
             var fieldid = undefined;
-            if(filterBy===undefined) filterBy="model";
-            if(filterBy=="id"){
+            if (filterBy === undefined) filterBy = "model";
+            if (filterBy == "id") {
                 if (!filterValue.startsWith($this.renderer.target + "_")) {
                     fieldid = $this.renderer.target + "_" + filterValue;
                 }
-                else{
+                else {
                     fieldid = filterValue;
                 }
             }
-            else if(filterBy=="position"){
+            else if (filterBy == "position") {
                 fieldid = $this.renderer.getFieldIdAt(parseInt(filterValue));
             }
-            else{
+            else {
                 fieldid = $this.renderer.getfieldIdOfModel(filterValue);
             }
             //return $this.renderer.getFieldParams(filterValue,filterBy);
@@ -166,30 +179,29 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
      * @param filterBy [optional] the filter type (id, position ou model); The default value is model
      * @returns {*}
      */
-    this.getFieldValue = function(field,filterBy){
-        if(filterBy=="id"){
+    this.getFieldValue = function (field, filterBy) {
+        if (filterBy == "id") {
             return this.getValueOf(field);
         }
-        else if(filterBy=="position"){
+        else if (filterBy == "position") {
             return this.getValueAt(parseInt(field));
         }
-        else{
+        else {
             return this.getValueOfModel(field);
         }
     };
 
-    this.setFieldValue = function(field,value,filterBy){
-        if(filterBy=="id"){
-            return this.setValueOf(field,value);
+    this.setFieldValue = function (field, value, filterBy) {
+        if (filterBy == "id") {
+            return this.setValueOf(field, value);
         }
-        else if(filterBy=="position"){
-            return this.setValueAt(parseInt(field),value);
+        else if (filterBy == "position") {
+            return this.setValueAt(parseInt(field), value);
         }
-        else{
-            return this.setValueOfModel(field,value);
+        else {
+            return this.setValueOfModel(field, value);
         }
     }
-
 
 
 });

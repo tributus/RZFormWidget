@@ -9,18 +9,27 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         $this.sender = sender;
     };
 
-    this.render = function (target, params) {
+    this.render = function (target, params,createDomElement) {
         $this.target = target;
         var sb = new StringBuilder();
         sb.appendFormat('    <tr id="{0}base_form">', target);
         rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
 
         sb.appendFormat('    </tr>');
-        $("#" + target).append(sb.toString());
-        rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        rz.widgets.formHelpers.bindEventHandlers($this.sender);
 
-
+        createDomElement({
+            target: "#" + target,
+            data:sb,
+            method: "append",
+            doAfterRenderAction:function(){
+                rz.widgets.formHelpers.doPosRenderActions($this.sender);
+                rz.widgets.formHelpers.bindEventHandlers($this.sender);
+            }
+        });
+        $this.sender.innerWidgetInitializeData.forEach(function(data){
+            if(data.doAfterRenderAction!==undefined) data.doAfterRenderAction();
+        });
+        $this.sender.innerWidgetInitializeData = [];
     };
 
     var renderDataField = function (sb, field) {

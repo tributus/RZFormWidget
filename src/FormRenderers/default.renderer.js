@@ -51,9 +51,11 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
                 rz.widgets.formHelpers.bindEventHandlers($this.sender);
             }
         });
-        // $("#" + target).append(sb.toString());
-        // rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        // rz.widgets.formHelpers.bindEventHandlers($this.sender);
+        $this.sender.innerWidgetInitializeData.forEach(function(data){
+            if(data.doAfterRenderAction!==undefined) data.doAfterRenderAction();
+        });
+        $this.sender.innerWidgetInitializeData = [];
+
     };
 
     var isElegibleFormTabPanel = function () {

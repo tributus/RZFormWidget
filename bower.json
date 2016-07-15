@@ -33,6 +33,6 @@
     "semantic-ui-dropdown": "^2.2.1",
     "semantic-ui-transition": "^2.2.1",
     "rutezangada-clientengine": "^0.5.2",
-    "rutezangada-actionsbarwidget": "rutezangada-actionsbar#^0.4.1"
+    "rutezangada-actionsbarwidget": "rutezangada-actionsbar#^0.5.1"
   }
 }

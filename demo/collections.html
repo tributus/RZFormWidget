@@ -149,34 +149,55 @@
                 {model: "Cidade", label: "Cidade", type: "text", id: "cidade", fieldSetName:"enderecos"},
                 {
                     type: "actions",
+                    id:"colactions",
                     params:{
-                    ui:{
-                        rootElementClass:"ui right aligned flat segment"
-                    },
-                    items:[
-                        {text:"cancelar",action:"cancel", cssClass:"secondary", renderTag:"button"},
-                        {text:"salvar",action:"save",cssClass:"primary",renderTag:"button"}
-                    ]
-                }
+                        ui:{
+                            rootElementClass:""
+                        },
+                        items:[
+                            {text:"adicionar",action:"add-to-collection", cssClass:"primary", renderTag:"button"},
+                            {text:"atualizar",action:"update-into-collection", cssClass:"primary", renderTag:"button", display:"none"},
+                            {text:"cancelar",action:"cancel-update-into-collection", cssClass:"secondary", renderTag:"button", display:"none"},
+                            {text:"limpar",action:"clear-collection", cssClass:"negative", renderTag:"button", display:"none"}
+                        ]
+                    }
                 },
-//***ORIGINAL*******//
-//                {
-//                    type: "actions",
-//                    actions:[
-//                        {type:"button", name:"add-to-collection",label:"adicionar",cssClass:"primary"},
-//                        {type:"button", name:"update-into-collection",label:"atualizar",cssClass:"primary"},
-//                        {type:"button", name:"clear-collection",label:"limpar",cssClass:"secondary"}
-//                    ]
-//                },
                 {
                     model:"Enderecos", label:"Endereços", type:"collection",id:"colend",
                     mainElementCss:"ui raised secondary segment",
                     collectionContainerCssClsss:"middle aligned divided",
+                    stateChangedHandler:function(sender,e){
+                        var act = rz.widgets.formHelpers.getFieldParams("smform_colactions", widgetInstance.renderer.params.fields).widgetInstance;
+                        switch (e.state){
+                            case "empty":
+                                act.show("add-to-collection");
+                                act.hide("update-into-collection");
+                                act.hide("cancel-update-into-collection");
+                                act.hide("clear-collection");
+                                break;
+                            case "edited":
+                            case "editCancel":
+                            case "deleted":
+                            case "added":
+                                act.show("add-to-collection");
+                                act.hide("update-into-collection");
+                                act.hide("cancel-update-into-collection");
+                                act.show("clear-collection");
+                                break;
+                            case "enterEditMode":
+                                act.hide("add-to-collection");
+                                act.show("update-into-collection");
+                                act.show("cancel-update-into-collection");
+                                act.hide("clear-collection");
+                                break;
+                        }
+                    },
                     itemsSource:{
                         type:"fieldset", //"form"
                         source:"enderecos",
                         addToCollectiontrigger:"add-to-collection",
                         updateCollectionTrigger:"update-into-collection",
+                        cancelUpdateCollectionTrigger:"cancel-update-into-collection",
                         clearCollectionTrigger:"clear-collection",
                         displayMemberPath:"Rua", //only for default renderer
                         confirmClearMethod:function(sender,e,callback){
@@ -202,8 +223,8 @@
                             callback(result);
                         },
                         actions:[
-                            {name: "Excluir item", action: "remove-item", icon: "delete"},
-                            {name: "Editar item", action: "edit-item", icon: "edit"}
+                            {name: "Editar item", action: "edit-item", icon: "edit"},
+                            {name: "Excluir item", action: "remove-item", icon: "delete"}
                         ]
                     }
                 }

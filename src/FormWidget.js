@@ -4,6 +4,7 @@
 rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers.FormWidgetInterface,rz.widgets.RZFormWidgetHelpers.FormWidgetEventHandlers,function () {
     var $this = this;
     this.validationReport = [];
+    this.innerWidgetInitializeData = [];
     $this.lastFieldsetRules = undefined;
     this.initialize = function (params, initialized) {
         var renderer = params.renderer || "default";

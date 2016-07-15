@@ -14,7 +14,7 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         $this.sender = sender;
     };
 
-    this.render = function (target, params) {
+    this.render = function (target, params,createDomElement) {
         $this.target = target;
         var sb = new StringBuilder();
         sb.append('<div class="grid-form">');
@@ -28,10 +28,27 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         sb.append('  </table>');
         sb.append('</form>');
         sb.append('</div>');
-        $("#" + target).append(sb.toString());
-        rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        rz.widgets.formHelpers.bindEventHandlers($this.sender);
-        bindCollapseButtonEvents();
+
+
+        createDomElement({
+            target: "#" + target,
+            data:sb,
+            method: "append",
+            doAfterRenderAction:function(){
+                rz.widgets.formHelpers.doPosRenderActions($this.sender);
+                rz.widgets.formHelpers.bindEventHandlers($this.sender);
+                bindCollapseButtonEvents();
+            }
+        });
+        $this.sender.innerWidgetInitializeData.forEach(function(data){
+            if(data.doAfterRenderAction!==undefined) data.doAfterRenderAction();
+        });
+        $this.sender.innerWidgetInitializeData = [];
+
+        // $("#" + target).append(sb.toString());
+        // rz.widgets.formHelpers.doPosRenderActions($this.sender);
+        // rz.widgets.formHelpers.bindEventHandlers($this.sender);
+        // bindCollapseButtonEvents();
     };
 
     var bindCollapseButtonEvents = function () {

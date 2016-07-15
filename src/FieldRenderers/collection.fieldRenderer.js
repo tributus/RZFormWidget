@@ -137,6 +137,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
     bindEvents: function (id, emit, sender) {
         var fieldParams = rz.widgets.formHelpers.getFieldParams(id, sender.renderer.params.fields);
         var source = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemsSource.type") || "fieldset";
+        var stateChangedHandler = fieldParams.stateChangedHandler || function(){};
         var fieldsets = {
             rule: 'restrict',
             fieldsets: fieldParams.itemsSource.source.split(' ')
@@ -149,6 +150,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                         var newItem = sender.getFormData(fieldsets);
                         sender.clearFormData(fieldsets);
                         sender.setValueOf(id, newItem);
+                        stateChangedHandler(sender,{state:"added",fieldParams:fieldParams});
                         //emit aqui ? ou lá?
                     }
                 }, fieldsets);
@@ -164,11 +166,13 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 confirmMethod(sender,{params:fieldParams},function(confirm){
                     if(confirm){
                         sender.setValueOf(fieldParams.id,null,sender);
+                        stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
                     }
                 });
             }
             else{
                 sender.setValueOf(fieldParams.id,null,sender);
+                stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
             }
         });
 
@@ -186,6 +190,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                         var sb = new StringBuilder();
                         contentRenderer(sb,fieldParams,newItem,"edit-mode");
                         el.find(".data-area").html(sb.toString());
+                        stateChangedHandler(sender,{state:"edited",fieldParams:fieldParams});
 
                         //emit aqui ? ou lá?
                     }
@@ -195,7 +200,18 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 throw "NOT_IMPLEMENTED";
             }
         });
-
+        
+        sender.on(fieldParams.itemsSource.cancelUpdateCollectionTrigger,function(sender){
+            if (source=="fieldset") {
+                sender.clearFormData(fieldsets);
+                var el = $("#" + fieldParams.id + " .edit-mode");
+                el.removeClass("edit-mode");
+                stateChangedHandler(sender,{state:"editCancel",fieldParams:fieldParams});
+            }
+            else if(source=="xxxxxxxxxxx"){
+                throw "NOT_IMPLEMENTED";
+            }
+        });
 
         sender.on("collection-request-change", function (sender, e) {
             var fieldid = e.fieldid;
@@ -204,6 +220,13 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
                 $("#" + e.rowid).fadeOut("fast", function () {
                     $("#" + e.rowid).detach();
+                    var count = $("#" + e.fieldid + " .collection-dataitem").length;
+                    if(count > 0){
+                        stateChangedHandler(sender,{state:"deleted",fieldParams:fieldParams});
+                    }
+                    else{
+                        stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
+                    }
                 });
                 //todo emit (changed)
             };
@@ -216,7 +239,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                         rule: "restrict",
                         fieldsets: fieldParams.itemsSource.source.split(' ')
                     });
-                    //todo add edit class on row;
+                    stateChangedHandler(sender,{state:"enterEditMode",fieldParams:fieldParams});
                 }
                 else { //if form
                     throw "not implemented yeeeeeet";

@@ -7,12 +7,16 @@ rz.widgets.formHelpers.createFieldRenderer("actions", {
             eventArgs.cancel = true;
             sb.append(renderData.data.toString());
             //register after numseiukê
-            sender.enqueueInnerWidgetToInitialize();
+            sender.sender.innerWidgetInitializeData.push(renderData);
             callback(eventArgs);
         });
     },
     bindEvents: function (id, emit, sender) {
-        
+        var fparams = rz.widgets.formHelpers.getFieldParams(id, sender.renderer.params.fields);
+        fparams.widgetInstance.on("action-raised",function(s,e){
+            emit(e.action, {field: id,targetElement: e,action:e.action,src: "usr"},sender);
+            //emit("data-changed", {fieldid: id,value: value,src: "usr",text:text},sender);
+        });
     },
     doPosRenderActions: function (id, $this) {}
 

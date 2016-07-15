@@ -320,18 +320,20 @@ rz.widgets.formHelpers.createFieldRenderer("actions", {
             eventArgs.cancel = true;
             sb.append(renderData.data.toString());
             //register after numseiukê
-            sender.enqueueInnerWidgetToInitialize();
+            sender.sender.innerWidgetInitializeData.push(renderData);
             callback(eventArgs);
         });
     },
     bindEvents: function (id, emit, sender) {
-        
+        var fparams = rz.widgets.formHelpers.getFieldParams(id, sender.renderer.params.fields);
+        fparams.widgetInstance.on("action-raised",function(s,e){
+            emit(e.action, {field: id,targetElement: e,action:e.action,src: "usr"},sender);
+            //emit("data-changed", {fieldid: id,value: value,src: "usr",text:text},sender);
+        });
     },
     doPosRenderActions: function (id, $this) {}
 
 });
-
-
 
 /********************ORIGINAL**************************/
 // rz.widgets.formHelpers.createFieldRenderer("actions", {
@@ -511,6 +513,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
     bindEvents: function (id, emit, sender) {
         var fieldParams = rz.widgets.formHelpers.getFieldParams(id, sender.renderer.params.fields);
         var source = rz.helpers.jsonUtils.getDataAtPath(fieldParams,"itemsSource.type") || "fieldset";
+        var stateChangedHandler = fieldParams.stateChangedHandler || function(){};
         var fieldsets = {
             rule: 'restrict',
             fieldsets: fieldParams.itemsSource.source.split(' ')
@@ -523,6 +526,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                         var newItem = sender.getFormData(fieldsets);
                         sender.clearFormData(fieldsets);
                         sender.setValueOf(id, newItem);
+                        stateChangedHandler(sender,{state:"added",fieldParams:fieldParams});
                         //emit aqui ? ou lá?
                     }
                 }, fieldsets);
@@ -538,11 +542,13 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 confirmMethod(sender,{params:fieldParams},function(confirm){
                     if(confirm){
                         sender.setValueOf(fieldParams.id,null,sender);
+                        stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
                     }
                 });
             }
             else{
                 sender.setValueOf(fieldParams.id,null,sender);
+                stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
             }
         });
 
@@ -560,6 +566,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                         var sb = new StringBuilder();
                         contentRenderer(sb,fieldParams,newItem,"edit-mode");
                         el.find(".data-area").html(sb.toString());
+                        stateChangedHandler(sender,{state:"edited",fieldParams:fieldParams});
 
                         //emit aqui ? ou lá?
                     }
@@ -569,7 +576,18 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 throw "NOT_IMPLEMENTED";
             }
         });
-
+        
+        sender.on(fieldParams.itemsSource.cancelUpdateCollectionTrigger,function(sender){
+            if (source=="fieldset") {
+                sender.clearFormData(fieldsets);
+                var el = $("#" + fieldParams.id + " .edit-mode");
+                el.removeClass("edit-mode");
+                stateChangedHandler(sender,{state:"editCancel",fieldParams:fieldParams});
+            }
+            else if(source=="xxxxxxxxxxx"){
+                throw "NOT_IMPLEMENTED";
+            }
+        });
 
         sender.on("collection-request-change", function (sender, e) {
             var fieldid = e.fieldid;
@@ -578,6 +596,13 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
                 $("#" + e.rowid).fadeOut("fast", function () {
                     $("#" + e.rowid).detach();
+                    var count = $("#" + e.fieldid + " .collection-dataitem").length;
+                    if(count > 0){
+                        stateChangedHandler(sender,{state:"deleted",fieldParams:fieldParams});
+                    }
+                    else{
+                        stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
+                    }
                 });
                 //todo emit (changed)
             };
@@ -590,7 +615,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                         rule: "restrict",
                         fieldsets: fieldParams.itemsSource.source.split(' ')
                     });
-                    //todo add edit class on row;
+                    stateChangedHandler(sender,{state:"enterEditMode",fieldParams:fieldParams});
                 }
                 else { //if form
                     throw "not implemented yeeeeeet";
@@ -846,9 +871,11 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
                 rz.widgets.formHelpers.bindEventHandlers($this.sender);
             }
         });
-        // $("#" + target).append(sb.toString());
-        // rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        // rz.widgets.formHelpers.bindEventHandlers($this.sender);
+        $this.sender.innerWidgetInitializeData.forEach(function(data){
+            if(data.doAfterRenderAction!==undefined) data.doAfterRenderAction();
+        });
+        $this.sender.innerWidgetInitializeData = [];
+
     };
 
     var isElegibleFormTabPanel = function () {
@@ -1098,18 +1125,27 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         $this.sender = sender;
     };
 
-    this.render = function (target, params) {
+    this.render = function (target, params,createDomElement) {
         $this.target = target;
         var sb = new StringBuilder();
         sb.appendFormat('    <tr id="{0}base_form">', target);
         rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
 
         sb.appendFormat('    </tr>');
-        $("#" + target).append(sb.toString());
-        rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        rz.widgets.formHelpers.bindEventHandlers($this.sender);
 
-
+        createDomElement({
+            target: "#" + target,
+            data:sb,
+            method: "append",
+            doAfterRenderAction:function(){
+                rz.widgets.formHelpers.doPosRenderActions($this.sender);
+                rz.widgets.formHelpers.bindEventHandlers($this.sender);
+            }
+        });
+        $this.sender.innerWidgetInitializeData.forEach(function(data){
+            if(data.doAfterRenderAction!==undefined) data.doAfterRenderAction();
+        });
+        $this.sender.innerWidgetInitializeData = [];
     };
 
     var renderDataField = function (sb, field) {
@@ -1259,7 +1295,7 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         $this.sender = sender;
     };
 
-    this.render = function (target, params) {
+    this.render = function (target, params,createDomElement) {
         $this.target = target;
         var sb = new StringBuilder();
         sb.append('<div class="grid-form">');
@@ -1273,10 +1309,27 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         sb.append('  </table>');
         sb.append('</form>');
         sb.append('</div>');
-        $("#" + target).append(sb.toString());
-        rz.widgets.formHelpers.doPosRenderActions($this.sender);
-        rz.widgets.formHelpers.bindEventHandlers($this.sender);
-        bindCollapseButtonEvents();
+
+
+        createDomElement({
+            target: "#" + target,
+            data:sb,
+            method: "append",
+            doAfterRenderAction:function(){
+                rz.widgets.formHelpers.doPosRenderActions($this.sender);
+                rz.widgets.formHelpers.bindEventHandlers($this.sender);
+                bindCollapseButtonEvents();
+            }
+        });
+        $this.sender.innerWidgetInitializeData.forEach(function(data){
+            if(data.doAfterRenderAction!==undefined) data.doAfterRenderAction();
+        });
+        $this.sender.innerWidgetInitializeData = [];
+
+        // $("#" + target).append(sb.toString());
+        // rz.widgets.formHelpers.doPosRenderActions($this.sender);
+        // rz.widgets.formHelpers.bindEventHandlers($this.sender);
+        // bindCollapseButtonEvents();
     };
 
     var bindCollapseButtonEvents = function () {
@@ -1578,6 +1631,7 @@ rz.widgets.formHelpers.createFormValidator("required",function(sender,value,vali
 rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers.FormWidgetInterface,rz.widgets.RZFormWidgetHelpers.FormWidgetEventHandlers,function () {
     var $this = this;
     this.validationReport = [];
+    this.innerWidgetInitializeData = [];
     $this.lastFieldsetRules = undefined;
     this.initialize = function (params, initialized) {
         var renderer = params.renderer || "default";

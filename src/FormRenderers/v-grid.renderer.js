@@ -178,10 +178,11 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
             return rz.widgets.formHelpers.getValueOfField("#" + id);
         }
     };
-
+    this.getfieldIdOfModel = function(model){
+        return $("#" + $this.target + "base_form .field[data-model='"+model+"']").attr("id");
+    };
     this.getValueOfModel = function (model) {
-        var id = $("#" + $this.target + "base_form .field[data-model='"+model+"']").attr("id");
-        return $this.getValueOf(id);
+        return $this.getValueOf($this.getfieldIdOfModel(model));
     };
 
     this.setValueOfModel = function (model,value) {

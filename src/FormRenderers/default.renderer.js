@@ -147,6 +147,9 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
         else {
             var h = $this.params.horizontal;
+            if(field.horizontal !==undefined){
+                h = field.horizontal;
+            }
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
             sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6} {7}">',
@@ -235,11 +238,6 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         return rz.widgets.formHelpers.getValueOfField("#" + fieldid);
     };
 
-    this.getValueOfModel = function (model) {
-        var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");
-        return $this.getValueOf(id);
-    };
-
     this.setValueOfModel = function (model,value) {
         var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");
         return $this.setValueOf(id,value);
@@ -280,10 +278,6 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule,$this.sender);
     };
 
-    /**
-     * validates de form data
-     * @param {function } validationResultHandler - method invoked after validation
-     */
     this.validateForm = function(validationResultHandler,fieldsetRule,forceSuccess){
         rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule,forceSuccess);
     };

@@ -25,7 +25,10 @@ rz.widgets.RZFormWidgetHelpers = {
         "clearFormData",
         "validateForm",
         "validateFieldAt",
-        "validateFieldOf"
+        "validateFieldOf",
+        "getFieldParams",
+        
+        "getFieldValue"
     ],
     FormWidgetEventHandlers : [
         "data-changed",

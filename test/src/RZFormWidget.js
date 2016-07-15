@@ -30,7 +30,10 @@ rz.widgets.RZFormWidgetHelpers = {
         "clearFormData",
         "validateForm",
         "validateFieldAt",
-        "validateFieldOf"
+        "validateFieldOf",
+        "getFieldParams",
+        
+        "getFieldValue"
     ],
     FormWidgetEventHandlers : [
         "data-changed",
@@ -140,7 +143,7 @@ rz.widgets.formHelpers = {
     },
     getValueOfField: function (id,sender) {
         var fieldType = $(id).data("fieldtype");
-        if(this.fieldRenderers[fieldType].getValue){
+        if(fieldType !== undefined && this.fieldRenderers[fieldType].getValue){
             return this.fieldRenderers[fieldType].getValue(id + "_" + fieldType,sender);
         }
         else{
@@ -334,46 +337,6 @@ rz.widgets.formHelpers.createFieldRenderer("actions", {
     doPosRenderActions: function (id, $this) {}
 
 });
-
-/********************ORIGINAL**************************/
-// rz.widgets.formHelpers.createFieldRenderer("actions", {
-//     actionRenderers : {
-//         button:function(actionData, sb,containerID){
-//             sb.appendFormat('<button id="{3}_action-button" class="ui {2} button rz-action-handler" data-action="{0}">{1}</button>',
-//                 actionData.name,
-//                 actionData.label || "",
-//                 actionData.cssClass || "primary",
-//                 containerID
-//             );
-//         }
-//     },
-//     render: function (sb, field, containerID) {
-//         var $this = this;
-//         if(field.actions !==undefined){
-//             field.actions.forEach(function(action){
-//                 $this.actionRenderers[action.type](action,sb,containerID);
-//             });
-//         }
-//         return containerID + "_collection";
-//     },
-//     bindEvents: function (id, emit, sender) {
-//         $("#" + id + " .button.rz-action-handler").click(function (e) {
-//             // try{
-//             var action  = $(e.currentTarget).data("action");
-//             if(action!==undefined){
-//                 emit(action, {field: id,targetElement: e,action:action,src: "usr"},sender);
-//             }
-//             return false;
-//             // }
-//             // catch (e){
-//             //     console.error(e);
-//             //     return false;
-//             // }
-//         });
-//     },
-//     doPosRenderActions: function (id, $this) {}
-//
-// });
 /**
  * Created by anderson.santos on 06/07/2016.
  */
@@ -474,7 +437,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     $(id).dropdown({
                         action: "hide",
                         onChange: function (item) {
-                            var $item = $(item);
+                            var $item = $("#" + item);
                             var action = $item.data("action");
                             var rowID = $item.data("rowid");
                             var fieldid = $item.data("targetfield");
@@ -661,13 +624,15 @@ rz.widgets.formHelpers.createFieldPartRenderer("default-actions", function (sb, 
     sb.appendFormat('        <i class="ellipsis vertical icon"></i>');
     sb.appendFormat('        <div class="menu">');
     sb.appendFormat('            <div class="header">{0}</div>', title);
+    var actindex = 0;
     params.itemActions.actions.forEach(function (action) {
-        sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}" data-targetfield="{4}"></i> {2}</div>',
+        sb.appendFormat('            <div id="itemfor_{3}{5}" class="item" data-value="itemfor_{3}{5}" data-rowid="{3}" data-action="{1}" data-targetfield="{4}"><i class="{0} icon"></i> {2}</div>',
             action.icon,
             action.action,
             action.name,
             params.__uid,
-            params.id
+            params.id,
+            actindex++
         );
     });
     sb.appendFormat('        </div>');
@@ -967,6 +932,9 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
         else {
             var h = $this.params.horizontal;
+            if(field.horizontal !==undefined){
+                h = field.horizontal;
+            }
             field.type = field.type || "text";
             field.id = "*_*".replace("*", $this.target).replace("*",fieldID);
             sb.appendFormat('<div id="{0}" data-fieldtype="{1}" data-model="{2}" {3} class="form-row {4}{5}{6} {7}">',
@@ -1055,11 +1023,6 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         return rz.widgets.formHelpers.getValueOfField("#" + fieldid);
     };
 
-    this.getValueOfModel = function (model) {
-        var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");
-        return $this.getValueOf(id);
-    };
-
     this.setValueOfModel = function (model,value) {
         var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");
         return $this.setValueOf(id,value);
@@ -1100,10 +1063,6 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         rz.widgets.formHelpers.clearFormDataImpl($this,fieldsetRule,$this.sender);
     };
 
-    /**
-     * validates de form data
-     * @param {function } validationResultHandler - method invoked after validation
-     */
     this.validateForm = function(validationResultHandler,fieldsetRule,forceSuccess){
         rz.widgets.formHelpers.validateFormImpl($this,params,validationResultHandler,fieldsetRule,forceSuccess);
     };
@@ -1219,10 +1178,15 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         }
     };
 
-    this.getValueOfModel = function (model) {
-        var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");
-        return $this.getValueOf(id);
-    };
+    //*****************************REFATORAÇÃO DO PADRÃO 1: override de campos comuns (todo fazer isto para os outros casos (e renderers)
+    // this.getfieldIdOfModel = function(model){
+    //     return $("#" + $this.target + "base_form .field[data-model='"+model+"']").attr("id");
+    //
+    // };
+    //
+    // this.getValueOfModel = function (model) {
+    //     return $this.getValueOf($this.getfieldIdOfModel(model));
+    // };
 
     this.setValueOfModel = function (model,value) {
         var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");
@@ -1459,10 +1423,11 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
             return rz.widgets.formHelpers.getValueOfField("#" + id);
         }
     };
-
+    this.getfieldIdOfModel = function(model){
+        return $("#" + $this.target + "base_form .field[data-model='"+model+"']").attr("id");
+    };
     this.getValueOfModel = function (model) {
-        var id = $("#" + $this.target + "base_form .field[data-model='"+model+"']").attr("id");
-        return $this.getValueOf(id);
+        return $this.getValueOf($this.getfieldIdOfModel(model));
     };
 
     this.setValueOfModel = function (model,value) {
@@ -1644,14 +1609,27 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         initialized($this.renderer.params);
     };
 
+    this.render = function (target, params,createDomElement) {
+        $this.renderer.render(target, params,createDomElement);
+    };
+
     var updateValidationStatus = function(){
         if($this.isFormInvalid){
             $this.validateForm(undefined, $this.lastFieldsetRules);
         }
     };
 
-    this.render = function (target, params,createDomElement) {
-        $this.renderer.render(target, params,createDomElement);
+    var impl = {
+        getValueOfModel : function (model) {
+            return $this.getValueOf($this.getfieldIdOfModel(model));
+        },
+        getfieldIdOfModel : function(model){
+            return $("#" + $this.renderer.target + "base_form .field[data-model='"+model+"']").attr("id");
+        }
+    };
+
+    var ensureHandler = function(n){
+        return $this.renderer[n] ||  impl[n];
     };
 
     this.fieldCount = function () {
@@ -1700,8 +1678,20 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         $this.renderer.setValueOf(fieldid, value);
     };
 
+    /**
+     * get a fieldid of field model(refatorado padrão 1)
+     * @param model
+     */
+    this.getfieldIdOfModel = function(model){
+        return ensureHandler("getfieldIdOfModel")(model);
+    };
+
+    /**
+     * get value of model (refatorado padrão 1)
+     * @param model
+     */
     this.getValueOfModel = function (model) {
-         return $this.renderer.getValueOfModel(model);
+        return ensureHandler("getValueOfModel")(model);
     };
 
     this.setValueOfModel = function (model,value) {
@@ -1725,13 +1715,73 @@ rz.widgets.FormWidget = ruteZangada.widget("Form",rz.widgets.RZFormWidgetHelpers
         $this.renderer.clearFormData(fieldsetRule);
     };
 
-    /**
-     * validates de form data
-     * @param {function } validationResultHandler - method invoked after validation
-     * @fieldsetRule {object} optional - fieldset rules
-     */
     this.validateForm = function(validationResultHandler,fieldsetRule){
         $this.lastFieldsetRules = fieldsetRule;
         $this.renderer.validateForm(validationResultHandler,fieldsetRule)
+    };
+
+    this.getFieldParams = function(filterValue,filterBy){
+        //filterBy = id,model,position
+        var handler = $this.renderer.getFieldParams;
+        if(handler !==undefined){
+            return handler(filterValue,filterBy);
+        }
+        else{
+            //defaultHandler
+            var fieldid = undefined;
+            if(filterBy===undefined) filterBy="model";
+            if(filterBy=="id"){
+                if (!filterValue.startsWith($this.renderer.target + "_")) {
+                    fieldid = $this.renderer.target + "_" + filterValue;
+                }
+                else{
+                    fieldid = filterValue;
+                }
+            }
+            else if(filterBy=="position"){
+                fieldid = $this.renderer.getFieldIdAt(parseInt(filterValue));
+            }
+            else{
+                fieldid = $this.renderer.getfieldIdOfModel(filterValue);
+            }
+            //return $this.renderer.getFieldParams(filterValue,filterBy);
+            return rz.widgets.formHelpers.getFieldParams(fieldid, $this.renderer.params.fields);
+        }
+
+    };
+
+    /***************************************************************************************************************/
+
+    /***
+     * gets the field value
+     * @param filterValue field name
+     * @param filterBy [optional] the filter type (id, position ou model); The default value is model
+     * @returns {*}
+     */
+    this.getFieldValue = function(field,filterBy){
+        if(filterBy=="id"){
+            return this.getValueOf(field);
+        }
+        else if(filterBy=="position"){
+            return this.getValueAt(parseInt(field));
+        }
+        else{
+            return this.getValueOfModel(field);
+        }
+    };
+
+    this.setFieldValue = function(field,value,filterBy){
+        if(filterBy=="id"){
+            return this.setValueOf(field,value);
+        }
+        else if(filterBy=="position"){
+            return this.setValueAt(parseInt(field),value);
+        }
+        else{
+            return this.setValueOfModel(field,value);
+        }
     }
+
+
+
 });

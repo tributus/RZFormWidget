@@ -103,10 +103,15 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         }
     };
 
-    this.getValueOfModel = function (model) {
-        var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");
-        return $this.getValueOf(id);
-    };
+    //*****************************REFATORAÇÃO DO PADRÃO 1: override de campos comuns (todo fazer isto para os outros casos (e renderers)
+    // this.getfieldIdOfModel = function(model){
+    //     return $("#" + $this.target + "base_form .field[data-model='"+model+"']").attr("id");
+    //
+    // };
+    //
+    // this.getValueOfModel = function (model) {
+    //     return $this.getValueOf($this.getfieldIdOfModel(model));
+    // };
 
     this.setValueOfModel = function (model,value) {
         var id = $("#" + $this.target +  "base_form .field[data-model='"+model+"']").attr("id");

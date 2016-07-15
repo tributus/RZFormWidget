@@ -98,7 +98,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     $(id).dropdown({
                         action: "hide",
                         onChange: function (item) {
-                            var $item = $(item);
+                            var $item = $("#" + item);
                             var action = $item.data("action");
                             var rowID = $item.data("rowid");
                             var fieldid = $item.data("targetfield");
@@ -285,13 +285,15 @@ rz.widgets.formHelpers.createFieldPartRenderer("default-actions", function (sb, 
     sb.appendFormat('        <i class="ellipsis vertical icon"></i>');
     sb.appendFormat('        <div class="menu">');
     sb.appendFormat('            <div class="header">{0}</div>', title);
+    var actindex = 0;
     params.itemActions.actions.forEach(function (action) {
-        sb.appendFormat('            <div class="item"><i class="{0} icon" data-action="{1}" data-rowid="{3}" data-targetfield="{4}"></i> {2}</div>',
+        sb.appendFormat('            <div id="itemfor_{3}{5}" class="item" data-value="itemfor_{3}{5}" data-rowid="{3}" data-action="{1}" data-targetfield="{4}"><i class="{0} icon"></i> {2}</div>',
             action.icon,
             action.action,
             action.name,
             params.__uid,
-            params.id
+            params.id,
+            actindex++
         );
     });
     sb.appendFormat('        </div>');

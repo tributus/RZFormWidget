@@ -109,16 +109,17 @@
                     fields: [
                         {
                             model: "PrimeiroNome",
-                            label: "Primeiro nome",
+                            label: "Nome",
                             type: "text",
                             id: "r0",
+                            horizontal:true,
                             fieldSetName:"nome",
                             attributes: [
-                                {name: "placeholder", value: "informe o primeiro nome"},
+                                {name: "placeholder", value: "Primeiro Nome"},
                                 {name: "data-foo", value: "ba"}
                             ]
                         },
-                        {model: "UltimoNome", label: "Último nome", type: "text", id: "r1", initialValue: "", fieldSetName:"nome foo"}
+                        {model: "UltimoNome", type: "text", id: "r1", initialValue: "", fieldSetName:"nome foo"}
                     ]
                 },
                 {model: "Email", label: "Email", type: "text", id: "email"},
@@ -167,7 +168,8 @@
                     mainElementCss:"ui raised secondary segment",
                     collectionContainerCssClsss:"middle aligned divided",
                     stateChangedHandler:function(sender,e){
-                        var act = rz.widgets.formHelpers.getFieldParams("smform_colactions", widgetInstance.renderer.params.fields).widgetInstance;
+                        var eid = "*_*".replace("*",sender.renderer.target).replace("*",e.fieldParams.itemsSource.triggerSourceElementID);
+                        var act = rz.widgets.formHelpers.getFieldParams(eid, widgetInstance.renderer.params.fields).widgetInstance;
                         switch (e.state){
                             case "empty":
                                 act.show("add-to-collection");
@@ -195,6 +197,9 @@
                     itemsSource:{
                         type:"fieldset", //"form"
                         source:"enderecos",
+                        triggerSourceElementID:"colactions", // isto é pra o caso específico de se usar um controle do tipo actions para adicionar, modificar ou limpar os dados da coleção.
+                                                             // Considerar se esta estratégia deve continuar. Esse valor é utilizado para atualizar os botões do controle de ação durante a
+                                                             // manipulação da coleção (stateChangedHandler aqui nos parâmetros)
                         addToCollectiontrigger:"add-to-collection",
                         updateCollectionTrigger:"update-into-collection",
                         cancelUpdateCollectionTrigger:"cancel-update-into-collection",
@@ -324,6 +329,11 @@
                 html += '            <th>CNPJ</th>';
                 html += '            <th>Senha</th>';
                 html += '            <th>Senha Confirm</th>';
+                html += '            <th>Rua</th>';
+                html += '            <th>Bairro</th>';
+                html += '            <th>Cidade</th>';
+                html += '            <th></th>';
+                html += '            <th>Endereços</th>';
                 html += '        </tr>';
                 html += '    </thead>';
                 html += '    <tbody id="smformG"></tbody>';
@@ -335,8 +345,7 @@
         }
     });
 
-
-    var widgetInstance = ruteZangada.renderWidget("Form", "smform", formData);
+    //var widgetInstance = ruteZangada.renderWidget("Form", "smform", formData);
 
     var getRData = function(){
         var ruletype = $("#ruletype").val();

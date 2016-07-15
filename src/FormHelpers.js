@@ -89,7 +89,7 @@ rz.widgets.formHelpers = {
     },
     getValueOfField: function (id,sender) {
         var fieldType = $(id).data("fieldtype");
-        if(this.fieldRenderers[fieldType].getValue){
+        if(fieldType !== undefined && this.fieldRenderers[fieldType].getValue){
             return this.fieldRenderers[fieldType].getValue(id + "_" + fieldType,sender);
         }
         else{

@@ -36,7 +36,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             renderTabPanels(sb);
         }
 
-        rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
+        rz.widgets.formHelpers.renderDataRows(sb, params, $this.renderDataField);
         sb.append('  </form>');
         sb.appendFormat('<div id="{0}_validation_report" class="validation-report-container"></div>',target);
         sb.append('</div>');
@@ -101,7 +101,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.appendFormat('<div class="active content">');
 
         field.fields.forEach(function (it) {
-            renderDataField(sb, it);
+            $this.renderDataField(sb, it);
         });
 
         sb.appendFormat('</div>');
@@ -114,7 +114,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             (field.active) ? "active" : ""
         );
         field.fields.forEach(function (it) {
-            renderDataField(sb, it);
+            $this.renderDataField(sb, it);
         });
         sb.appendFormat('</div>');
     };
@@ -126,12 +126,12 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         var fieldCountName = field.columCount ||c[fieldCount];
         sb.appendFormat('<div class="{0} fields">',fieldCountName);
         field.fields.forEach(function (it) {
-            renderDataField(sb, it);
+            $this.renderDataField(sb, it);
         });
         sb.appendFormat('</div>');
     };
 
-    var renderDataField = function (sb, field) {
+    this.renderDataField = function (sb, field) {
         var fieldID = (field.id || field.model || "field_" + generateRandomID(8)).replace(/\./g, "_");
         if (field.fieldGroup) {
             var groupType = field.groupType || "tabpanel";
@@ -197,39 +197,39 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     //     }
     // };
 
-    this.addField = function (fielddata) {
-        var sb = new StringBuilder();
-        renderDataField(sb, fielddata);
-        $("#" + $this.target + "base_form .form-row").last().parent().append(sb.toString());
-    };
+    // this.addField = function (fielddata) {
+    //     var sb = new StringBuilder();
+    //     renderDataField(sb, fielddata);
+    //     $("#" + $this.target + "base_form .form-row").last().parent().append(sb.toString());
+    // };
 
-    this.insertField = function (fielddata, position) {
-        var sb = new StringBuilder();
-        renderDataField(sb, fielddata);
-        $("#" + $this.target + "base_form .form-row").eq(position).before(sb.toString());
-    };
+    // this.insertField = function (fielddata, position) {
+    //     var sb = new StringBuilder();
+    //     $this.renderDataField(sb, fielddata);
+    //     $("#" + $this.target + "base_form .form-row").eq(position).before(sb.toString());
+    // };
 
-    this.removeFieldAt = function (position) {
-        var p = position;
-        if (p >= 0 && p < this.fieldCount()) {
-            $("#" + $this.target + "base_form .form-row").eq(p).remove();
-        }
-    };
+    // this.removeFieldAt = function (position) {
+    //     var p = position;
+    //     if (p >= 0 && p < this.sender.fieldCount()) {
+    //         $("#" + $this.target + "base_form .form-row").eq(p).remove();
+    //     }
+    // };
 
-    this.removeFieldById = function (fieldid) {
-        if (!fieldid.startsWith($this.target + "_")) {
-            fieldid = $this.target + "_" + fieldid;
-        }
-        $("#" + fieldid).remove();
-    };
+    // this.removeFieldById = function (fieldid) {
+    //     if (!fieldid.startsWith($this.target + "_")) {
+    //         fieldid = $this.target + "_" + fieldid;
+    //     }
+    //     $("#" + fieldid).remove();
+    // };
 
-    this.getValueAt = function (position) {
-        var p = position;
-        if (p >= 0 && p < this.fieldCount()) {
-            var id = $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
-            return rz.widgets.formHelpers.getValueOfField("#" + id);
-        }
-    };
+    // this.getValueAt = function (position) {
+    //     var p = position;
+    //     if (p >= 0 && p < this.sender.fieldCount()) {
+    //         var id = $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
+    //         return rz.widgets.formHelpers.getValueOfField("#" + id);
+    //     }
+    // };
 
     this.getValueOf = function (fieldid) {
         if (!fieldid.startsWith($this.target + "_")) {
@@ -245,7 +245,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
 
     this.setValueAt = function (position, value) {
         var p = position;
-        if (p >= 0 && p < this.fieldCount()) {
+        if (p >= 0 && p < this.sender.fieldCount()) {
             var id = $("#" + $this.target + "base_form .form-row").eq(p).attr("id");
             var formerValue = rz.widgets.formHelpers.getValueOfField("#" + id);
             if (formerValue != value) {

@@ -22,7 +22,7 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
         sb.appendFormat('  <table id="{0}base_form" class="ui celled table">', target);
         renderHeader(sb, params);
         sb.append('    <tbody>');
-        rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
+        rz.widgets.formHelpers.renderDataRows(sb, params, $this.renderDataField);
 
         sb.append('    </tbody>');
         sb.append('  </table>');
@@ -95,17 +95,17 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
             var groupInfoData = 'data-groupingid="*"'.replace('*', gid);
 
             field.fields.forEach(function (it) {
-                renderDataField(sb, it, groupInfoData);
+                $this.renderDataField(sb, it, groupInfoData);
             });
         }
         else{
             field.fields.forEach(function (it) {
-                renderDataField(sb, it, parentGroup);
+                $this.renderDataField(sb, it, parentGroup);
             });
         }
     };
 
-    var renderDataField = function (sb, field,gidata) {
+    this.renderDataField = function (sb, field,gidata) {
         var fieldID = (field.id || field.model || "row_" + generateRandomID(8)).replace(/\./g, "_");
         if (field.fieldGroup) {
             renderFieldGroup(field, fieldID, sb,gidata);
@@ -146,14 +146,14 @@ rz.widgets.FormRenderers["v-grid"] = function (params, sender) {
 
     this.addField = function (fielddata) {
         var sb = new StringBuilder();
-        renderDataField(sb, fielddata);
+        $this.renderDataField(sb, fielddata);
         $(sb.toString()).appendTo("#" + $this.target + "base_form tbody");
 
     };
 
     this.insertField = function (fielddata, position) {
         var sb = new StringBuilder();
-        renderDataField(sb, fielddata);
+        $this.renderDataField(sb, fielddata);
         $("#" + $this.target + "base_form tbody > .field-row").eq(position).before(sb.toString());
     };
 

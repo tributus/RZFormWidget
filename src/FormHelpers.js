@@ -161,18 +161,18 @@ rz.widgets.formHelpers = {
     },
     getFormDataImpl: function ($this,fieldsetRule) {
         var root = {};
-        var rcount = $this.fieldCount();
+        var rcount = $this.sender.fieldCount();
         for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
+            var id = $this.sender.getFieldIdAt(i);
             var model = $("#" + id).data("model");
             if(model!==undefined && model !="***"){
                 if(fieldsetRule!==undefined){
                     if(this.fieldMatchFieldSetRule(id,fieldsetRule)){
-                        rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
+                        rz.helpers.jsonUtils.setDataAtPath(root, $this.sender.getValueOf(id), model);
                     }
                 }
                 else{
-                    rz.helpers.jsonUtils.setDataAtPath(root, $this.getValueOf(id), model);
+                    rz.helpers.jsonUtils.setDataAtPath(root, $this.sender.getValueOf(id), model);
                 }
             }
 
@@ -180,22 +180,22 @@ rz.widgets.formHelpers = {
         return root;
     },
     setFormDataImpl: function (formData, $this,fieldsetRule) {
-        var rcount = $this.fieldCount();
+        var rcount = $this.sender.fieldCount();
         for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
+            var id = $this.sender.getFieldIdAt(i);
             if((fieldsetRule!==undefined && this.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
                 var model = $("#" + id).data("model");
                 if(model !==undefined && model !="***"){
                     var value = rz.helpers.jsonUtils.getDataAtPath(formData, model);
-                    $this.setValueOfModel(model, value);
+                    $this.sender.setValueOfModel(model, value);
                 }
             }
         }
     },
     clearFormDataImpl:function($this,fieldsetRule){
-        var rcount = $this.fieldCount();
+        var rcount = $this.sender.fieldCount();
         for (var i = 0; i < rcount; i++) {
-            var id = $this.getFieldIdAt(i);
+            var id = $this.sender.getFieldIdAt(i);
             if((fieldsetRule!==undefined && this.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
                 var initialValue = $("#" + id).data("initial-value");
                 if (initialValue !== undefined && initialValue.toString().match(/^object-data:\[.*]$/) != null) {

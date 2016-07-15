@@ -29,25 +29,55 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
     };
 
     var impl = {
-            getValueOfModel: function (model) {
-                return $this.getValueOf($this.getfieldIdOfModel(model));
-            },
-            getfieldIdOfModel: function (model) {
-                return $("#" + $this.renderer.target + "base_form .field[data-model='" + model + "']").attr("id");
-            },
-            fieldCount: function () {
-                return $("#" + $this.renderer.target + "base_form .form-row").length;
-            },
-            getFieldIdAt: function (position) {
-                var p = position;
-                if (p >= 0 && p < $this.fieldCount()) {
-                    return $("#" + $this.renderer.target + "base_form .form-row").eq(p).attr("id");
-                }
-                else {
-                    return undefined;
-                }
+        getValueOfModel: function (model) {
+            return $this.getValueOf($this.getfieldIdOfModel(model));
+        },
+        getfieldIdOfModel: function (model) {
+            return $("#" + $this.renderer.target + "base_form .field[data-model='" + model + "']").attr("id");
+        },
+        fieldCount: function () {
+            return $("#" + $this.renderer.target + "base_form .form-row").length;
+        },
+        getFieldIdAt: function (position) {
+            var p = position;
+            if (p >= 0 && p < $this.fieldCount()) {
+                return $("#" + $this.renderer.target + "base_form .form-row").eq(p).attr("id");
             }
-        };
+            else {
+                return undefined;
+            }
+        },
+        addField: function (fielddata) {
+            var sb = new StringBuilder();
+            $this.renderer.renderDataField(sb, fielddata);
+            $("#" + $this.renderer.target + "base_form .form-row").last().parent().append(sb.toString());
+        },
+        insertField: function (fielddata, position) {
+            var sb = new StringBuilder();
+            $this.renderer.renderDataField(sb, fielddata);
+            $("#" + $this.renderer.target + "base_form .form-row").eq(position).before(sb.toString());
+        },
+        removeFieldAt: function (position) {
+            var p = position;
+            if (p >= 0 && p < $this.fieldCount()) {
+                $("#" + $this.renderer.target + "base_form .form-row").eq(p).remove();
+            }
+        },
+        removeFieldById: function (fieldid) {
+            if (!fieldid.startsWith($this.renderer.target + "_")) {
+                fieldid = $this.renderer.target + "_" + fieldid;
+            }
+            $("#" + fieldid).remove();
+        },
+        getValueAt: function (position) {
+            var p = position;
+            if (p >= 0 && p < $this.fieldCount()) {
+                var id = $("#" + $this.renderer.target + "base_form .form-row").eq(p).attr("id");
+                return rz.widgets.formHelpers.getValueOfField("#" + id);
+            }
+        }
+
+    };
 
     var ensureHandler = function (n) {
         return $this.renderer[n] || impl[n];
@@ -62,29 +92,28 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
     };
 
     this.addField = function (fielddata) {
-        $this.renderer.addField(fielddata);
+        ensureHandler("addField")(fielddata);
         rz.widgets.formHelpers.bindEventHandlersOfField(fielddata.type, fielddata.id, $this);
         rz.widgets.formHelpers.doPosRenderActionsOfField(fielddata.type, fielddata.id, $this);
         $this.raiseEvent("field-added", fielddata, $this);
-
     };
 
     this.insertField = function (fielddata, position) {
-        $this.renderer.insertField(fielddata, position);
+        ensureHandler("insertField")(fielddata, position);
         rz.widgets.formHelpers.bindEventHandlersOfField(fielddata.type, fielddata.id, $this);
         rz.widgets.formHelpers.doPosRenderActionsOfField(fielddata.type, fielddata.id, $this);
     };
 
     this.removeFieldAt = function (position) {
-        $this.renderer.removeFieldAt(position);
+        ensureHandler("removeFieldAt")(position);
     };
 
     this.removeFieldById = function (fieldid) {
-        $this.renderer.removeFieldById(fieldid);
+        ensureHandler("removeFieldById")(fieldid);
     };
 
     this.getValueAt = function (position) {
-        return $this.renderer.getValueAt(position);
+        return ensureHandler("getValueAt")(position);
     };
 
     this.getValueOf = function (fieldid) {

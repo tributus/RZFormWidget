@@ -13,7 +13,7 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         $this.target = target;
         var sb = new StringBuilder();
         sb.appendFormat('    <tr id="{0}base_form">', target);
-        rz.widgets.formHelpers.renderDataRows(sb, params, renderDataField);
+        rz.widgets.formHelpers.renderDataRows(sb, params, $this.renderDataField);
 
         sb.appendFormat('    </tr>');
 
@@ -32,11 +32,11 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
         $this.sender.innerWidgetInitializeData = [];
     };
 
-    var renderDataField = function (sb, field) {
+    this.renderDataField = function (sb, field) {
         var fieldID = (field.id || field.model || "row_" + generateRandomID(8)).replace(/\./g, "_");
         if (field.fieldGroup) {
             field.fields.forEach(function (it) {
-                renderDataField(sb, it);
+                $this.renderDataField(sb, it);
             });
         }
         else {
@@ -71,13 +71,13 @@ rz.widgets.FormRenderers["grid-row"] = function (params, sender) {
 
     this.addField = function (fielddata) {
         var sb = new StringBuilder();
-        renderDataField(sb, fielddata);
+        $this.renderDataField(sb, fielddata);
         $(sb.toString()).appendTo("#" + $this.target + "base_form");
     };
 
     this.insertField = function (fielddata, position) {
         var sb = new StringBuilder();
-        renderDataField(sb, fielddata);
+        $this.renderDataField(sb, fielddata);
         $("#" + $this.target + "base_form > .row-form-field").eq(position).before(sb.toString());
     };
 

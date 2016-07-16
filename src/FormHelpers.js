@@ -116,7 +116,7 @@ rz.widgets.formHelpers = {
         var formData = $this.sender.getFormData();
         var $that = this;
 
-        if (params.validation.enabled) {
+        if (params.validation !==undefined && params.validation.enabled) {
             $this.sender.validationReport = [];
             params.validation.rules.forEach(function (rule) {
                 var fieldID = $("#" + $this.target +  "base_form .field[data-model='"+rule.model+"']").attr("id");
@@ -202,7 +202,7 @@ rz.widgets.formHelpers = {
                     initialValue = initialValue.replace(/^object-data:\[/, "").replace(/]$/, "");
                     initialValue = JSON.parse(atob(initialValue));
                 }
-                $this.setValueAt(i, initialValue);
+                $this.sender.setValueAt(i, initialValue);
             }
         }
     },

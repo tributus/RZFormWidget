@@ -56,7 +56,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     var isElegibleFormTabPanel = function () {
         var elegible = true;
         $this.params.fields.forEach(function (it) {
-            if (!it.fieldGroup) {
+            if (!it.fieldGroup || (it.groupType !==undefined && it.groupType !="tabpanel")) {
                 elegible = false;
                 return null;
             }

@@ -63,6 +63,8 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
         var id = fid.substring(0, fid.lastIndexOf("_collection"));
         /*particular for non input controls*/
         var fieldParams = rz.widgets.formHelpers.getFieldParams(id.replace("#", ""), sender.renderer.params.fields);
+        var stateChangedHandler = fieldParams.stateChangedHandler || function(){};
+
         var sb = new StringBuilder();
         var $this = this;
         var processAddValue = function (item) {
@@ -131,7 +133,8 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
 
         $(fid + "_collection_container").append(sb.toString());
         initializeActionsDropdown();
-
+        var state = (newValue==null||newValue==undefined)?"empty":"added";
+        stateChangedHandler(sender,{state:state,fieldParams:fieldParams});
     },
 
     bindEvents: function (id, emit, sender) {
@@ -149,13 +152,12 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     if (result.validated) {
                         var newItem = sender.getFormData(fieldsets);
                         sender.clearFormData(fieldsets);
-                        sender.setValueOf(id, newItem);
-                        stateChangedHandler(sender,{state:"added",fieldParams:fieldParams});
-                        //emit aqui ? ou lá?
+                        sender.setValueOf(id, newItem,{bypassEventHandling:true});
+                        emit("data-changed", {fieldid: id,value: newItem,src: "usr",changeType:"add"},sender);
                     }
                 }, fieldsets);
             }
-            else if(source=="xxxxxxxxxxx"){
+            else if(source=="xxxxxxxxxxx?"){
                 throw "NOT_IMPLEMENTED";
             }
         });
@@ -165,14 +167,16 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
             if(confirmMethod !==undefined){
                 confirmMethod(sender,{params:fieldParams},function(confirm){
                     if(confirm){
-                        sender.setValueOf(fieldParams.id,null,sender);
+                        sender.setValueOf(fieldParams.id,null,{bypassEventHandling:true});
                         stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
+                        emit("data-changed", {fieldid: id,value: null,src: "usr",changeType:"clear"},sender);
                     }
                 });
             }
             else{
-                sender.setValueOf(fieldParams.id,null,sender);
+                sender.setValueOf(fieldParams.id,null,{bypassEventHandling:true});
                 stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
+                emit("data-changed", {fieldid: id,value: null,src: "usr",changeType:"clear"},sender);
             }
         });
 
@@ -182,7 +186,6 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                     if (result.validated) {
                         var newItem = sender.getFormData(fieldsets);
                         sender.clearFormData(fieldsets);
-                        //sender.setValueOf(id, newItem);
                         var el = $("#" + fieldParams.id + " .edit-mode");
                         el.data("value",btoa(JSON.stringify(newItem)));
                         el.removeClass("edit-mode");
@@ -191,8 +194,7 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                         contentRenderer(sb,fieldParams,newItem,"edit-mode");
                         el.find(".data-area").html(sb.toString());
                         stateChangedHandler(sender,{state:"edited",fieldParams:fieldParams});
-
-                        //emit aqui ? ou lá?
+                        emit("data-changed", {fieldid: id,value: newItem,src: "usr",changeType:"update"},sender);
                     }
                 }, fieldsets);
             }
@@ -221,12 +223,15 @@ rz.widgets.formHelpers.createFieldRenderer("collection", {
                 $("#" + e.rowid).fadeOut("fast", function () {
                     $("#" + e.rowid).detach();
                     var count = $("#" + e.fieldid + " .collection-dataitem").length;
+                    var collectionEmpty = false;
                     if(count > 0){
                         stateChangedHandler(sender,{state:"deleted",fieldParams:fieldParams});
                     }
                     else{
                         stateChangedHandler(sender,{state:"empty",fieldParams:fieldParams});
+                        collectionEmpty = true;
                     }
+                    emit("data-changed", {fieldid: id,value: null,src: "usr",changeType:"delete", deletedData:e.rowData,isEmpty:collectionEmpty},sender);
                 });
                 //todo emit (changed)
             };

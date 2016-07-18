@@ -164,6 +164,9 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
             else {
                 return $this.setValueOfModel(field, value);
             }
+        },
+        getFieldsOfGroup:function(groupName){
+            
         }
 
     };
@@ -257,6 +260,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
 
     this.setFieldValue = function (field, value, filterBy) {
         return ensureHandler("setFieldValue")(field, value, filterBy);
+    };
+
+    this.getFieldsOfGroup = function(groupName){
+        return ensureHandler("getFieldsOfGroup")(groupName);
     }
 
 

@@ -138,6 +138,7 @@
             fields: [
                 {
                     fieldGroup:true,
+                    groupName: "group",
                     groupType:"fieldgroup",
                     columCount:"two",
                     fields:[
@@ -169,6 +170,7 @@
         },
         {
             fieldGroup: true,
+            groupName:"otinfo",
             groupLabel: "Outras informações",
             fields: [
                 {
@@ -176,14 +178,15 @@
                     {label: "lItem 1", value: 0},
                     {label: "lItem 2", value: 1},
                     {label: "lItem 3", value: 2}
-                ], initialValue: null
-            },
+                    ], initialValue: null
+                },
                 {model: "Obs", label: "Obs", type: "text", id: "r2", initialValue: ""},
                 {
                     fieldGroup: true,
                     groupType: "collapse",
                     collapsed: true,
                     //collapsible:false,
+                    groupName:"gp2",
                     groupLabel: "Endereço",
                     fields: [
                         {model: "endereco.rua", label: "Rua"},

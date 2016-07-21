@@ -222,7 +222,16 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
             return result;
         },        
         getFieldsOfRuleset:function(fieldsetRule){
-            
+            var fields = [];
+            var rcount = $this.fieldCount();
+            for (var i = 0; i < rcount; i++) {
+                var id = $this.getFieldIdAt(i);
+                if((fieldsetRule!==undefined && rz.widgets.formHelpers.fieldMatchFieldSetRule(id,fieldsetRule)) || fieldsetRule===undefined){
+                    var originalid = id.replace($this.renderer.target + "_","");
+                    fields.push($this.getFieldParams(originalid,"id"));
+                }
+            }
+            return fields;
         }
     };
 

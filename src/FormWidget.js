@@ -232,6 +232,9 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 }
             }
             return fields;
+        },
+        disableFields:function(filterValue,filterBy){
+            
         }
     };
 
@@ -337,6 +340,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
     this.getFieldsOfRuleset = function(fieldsetRule){
         return ensureHandler("getFieldsOfRuleset")(impl.resolveRuleset(fieldsetRule));
     };
+
+    this.disableFields = function(filterValue,filterBy){
+        ensureHandler("disableFields")(filterValue,filterBy);
+    }
 
 
 });

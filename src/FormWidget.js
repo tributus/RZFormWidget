@@ -28,6 +28,22 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
         }
     };
 
+    this.getAllFieldDefinitions = function(){
+        var fieldList = [];
+        var traverseFields = function(fields){
+            fields.forEach(function(f){
+                if(f.fieldGroup){
+                        traverseFields(f.fields);
+                }
+                else{
+                    fieldList.push(f);
+                }
+            });
+        };
+        traverseFields($this.renderer.params.fields);
+        return fieldList;
+    };
+
     var ensureHandler = function (n) {
         return $this.renderer[n] || impl[n];
     };
@@ -233,8 +249,36 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
             }
             return fields;
         },
+        getFieldDefinitions:function(filterValue,filterBy){
+            var fields = [];
+            if(filterValue===undefined){
+                fields = $this.getAllFieldDefinitions();
+            }
+            else{
+                switch(filterBy || "model"){
+                    case "id":
+                    case "position":
+                    case "model":
+                        var f = $this.getFieldParams(filterValue,filterBy);
+                        if(f !==undefined) fields.push(f);
+                        break;
+                    case "fieldset":
+                        fields = $this.getFieldsOfRuleset(filterValue);
+                        break;
+                    case "group":
+                        fields = $this.getFieldsOfGroup(filterValue);
+                        break;
+                    break
+                }
+
+            }
+            return fields;
+        },
         disableFields:function(filterValue,filterBy){
-            
+            var fields = $this.getFieldDefinitions(filterValue,filterBy);
+            if(fields.length > 0){
+
+            }
         }
     };
 
@@ -335,6 +379,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
 
     this.getFieldsOfGroup = function(groupName){
         return ensureHandler("getFieldsOfGroup")(groupName);
+    };
+
+    this.getFieldDefinitions = function(filterValue,filterBy){
+        return ensureHandler("getFieldDefinitions")(filterValue,filterBy);
     };
 
     this.getFieldsOfRuleset = function(fieldsetRule){

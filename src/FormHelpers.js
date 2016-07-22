@@ -257,6 +257,12 @@ rz.widgets.formHelpers = {
 
         });
         return result;
+    },
+    executeFieldAction:function(action,id,sender,params,fieldDefinition,callback){
+        var frenderer = this.fieldRenderers[fieldDefinition.type || "text"];
+        if(frenderer !==undefined && frenderer.executeAction !==undefined){
+            frenderer.executeAction(action,id,sender,params,fieldDefinition,callback);
+        }
     }
 
 

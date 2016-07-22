@@ -31,6 +31,15 @@ rz.widgets.formHelpers.createFieldRenderer("text", {
             emit("data-changed", {field: id,value: e.target.value,src: "usr"},sender);
         });
     },
-    doPosRenderActions: function (id, $this) {}
-
+    doPosRenderActions: function (id, $this) {},
+    executeAction:function(action,id){ //outros parâmetros: sender,params,fieldDefinition,callback
+        switch (action){
+            case "disable":
+                $("#" + id + " input").attr("disabled","disabled");
+                break;
+            case "enable":
+                $("#" + id + " input").removeAttr("disabled");
+                break;
+        }
+    }
 });

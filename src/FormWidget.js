@@ -50,15 +50,20 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
 
     var impl = {
         resolveRuleset: function(fieldsetRule){
-            if(typeof(fieldsetRule)=="object")
-            {
-                return fieldsetRule;
+            if(fieldsetRule===undefined){
+                return undefined;
             }
             else{
-                return {
-                    rule:"restrict",
-                    fieldsets: fieldsetRule.split(' ')
-                };
+                if(typeof(fieldsetRule)=="object")
+                {
+                    return fieldsetRule;
+                }
+                else{
+                    return {
+                        rule:"restrict",
+                        fieldsets: fieldsetRule.split(' ')
+                    };
+                }
             }
 
         },
@@ -270,14 +275,49 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                         break;
                     break
                 }
-
             }
             return fields;
         },
         disableFields:function(filterValue,filterBy){
             var fields = $this.getFieldDefinitions(filterValue,filterBy);
             if(fields.length > 0){
-
+                fields.forEach(function(field){
+                    $("#" + field.id).addClass("disabled");
+                    rz.widgets.formHelpers.executeFieldAction("disable",field.id,$this,undefined,field);
+                });
+            }
+        },
+        enableFields:function(filterValue,filterBy){
+            var fields = $this.getFieldDefinitions(filterValue,filterBy);
+            if(fields.length > 0){
+                fields.forEach(function(field){
+                    $("#" + field.id).removeClass("disabled");
+                    rz.widgets.formHelpers.executeFieldAction("enable",field.id,$this,undefined,field);
+                });
+            }
+        },
+        hideFields : function(filterValue,filterBy,preserveGroupVisibility){
+            var fields = $this.getFieldDefinitions(filterValue,filterBy);
+            if(fields.length > 0){
+                fields.forEach(function(field){
+                    $("#" + field.id).css("display","none");
+                    rz.widgets.formHelpers.executeFieldAction("hide",field.id,$this,undefined,field);
+                });
+                if(filterBy=="group" && !preserveGroupVisibility){
+                    console.warn("Should hide group");
+                }
+            }
+        },
+        displayFields:function(filterValue,filterBy){
+            var fields = $this.getFieldDefinitions(filterValue,filterBy);
+            if(fields.length > 0){
+                fields.forEach(function(field){
+                    $("#" + field.id).css("display","");
+                    rz.widgets.formHelpers.executeFieldAction("display",field.id,$this,undefined,field);
+                });
+                if(filterBy=="group"){
+                    console.warn("Should display group");
+                }
             }
         }
     };
@@ -391,7 +431,18 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
 
     this.disableFields = function(filterValue,filterBy){
         ensureHandler("disableFields")(filterValue,filterBy);
-    }
+    };
 
+    this.enableFields = function(filterValue,filterBy){
+        ensureHandler("enableFields")(filterValue,filterBy);
+    };
+
+    this.hideFields = function(filterValue,filterBy,preserveGroupVisibility){
+        ensureHandler("hideFields")(filterValue,filterBy,preserveGroupVisibility);
+    };
+
+    this.displayFields = function(filterValue,filterBy){
+        ensureHandler("displayFields")(filterValue,filterBy);
+    }
 
 });

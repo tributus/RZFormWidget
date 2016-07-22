@@ -31,10 +31,8 @@ rz.widgets.RZFormWidgetHelpers = {
         "getGroupDefinition",
         "getFieldsOfGroup",
         "getFieldsOfRuleset",
-
         "getFieldDefinitions",
         "disableFields",
-
         "enableFields",
         "hideFields",
         "displayFields"

@@ -77,10 +77,11 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         sb.appendFormat('<div class="ui top attached tabular menu rz-tabpanel">');
         $this.params.fields.forEach(function (it, id) {
             var targetID = generateRandomID(12);
-            sb.appendFormat('<a class="item {2}" data-tab="{1}">{0}</a>'
+            sb.appendFormat('<a class="item {2}  visual-element-for-group-{3}" data-tab="{1}">{0}</a>'
                 , it.groupLabel
                 , targetID
-                , (id == actidx) ? "active" : "");
+                , (id == actidx) ? "active" : ""
+                , it.groupName);
             it.groupID = targetID;
             it.active = (id == actidx);
         });
@@ -104,9 +105,11 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     var renderTabContainer = function (sb, field) {
-        sb.appendFormat('<div class="ui bottom attached tab segment {1}" data-tab="{0}">',
+        sb.appendFormat('<div class="ui bottom attached tab segment {1} visual-element-for-group-{2}" data-tab="{0}">',
             field.groupID,
-            (field.active) ? "active" : ""
+            (field.active) ? "active" : "",
+            field.groupName
+
         );
         field.fields.forEach(function (it) {
             $this.renderDataField(sb, it);
@@ -124,6 +127,43 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             $this.renderDataField(sb, it);
         });
         sb.appendFormat('</div>');
+    };
+    
+    this.hideFieldGroup = function(groupInfo){
+        var groupType = groupInfo.groupType || "tabpanel";
+        switch(groupType){
+            case "tabpanel":
+                //if active then active another
+                $(".visual-element-for-group-" + groupInfo.groupName).css("display","none");
+                break;
+            case "collapse":break;
+            case "fieldgroup":break;
+        }
+    };
+
+    //interface (levar pra baixo)
+    this.activateGroup = function(name){
+        var params = $this.sender.getGroupInfo(name);
+        var groupType = params.groupType || "tabpanel";
+        if(groupType=="tabpanel"){
+            alert("pera");
+            console.error("oera");
+            $("").tab('change tab', 'tab-name');
+        }
+        if(groupType=="collapse"){
+
+        }
+    };
+
+    this.showFieldGroup = function(groupInfo){
+        var groupType = groupInfo.groupType || "tabpanel";
+        switch(groupType){
+            case "tabpanel":
+                $(".visual-element-for-group-" + groupInfo.groupName).css("display","");
+                break;
+            case "collapse":break;
+            case "fieldgroup":break;
+        }
     };
 
     this.renderDataField = function (sb, field) {

@@ -43,13 +43,27 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
         traverseFields($this.renderer.params.fields);
         return fieldList;
     };
+    this.getAllGroupDefinitions = function(){
+        var fieldList = [];
+        var traverseFields = function(fields){
+            fields.forEach(function(f){
+                if(f.fieldGroup){
+                    fieldList.push(f);
+                    traverseFields(f.fields);
+                }
+            });
+        };
+        traverseFields($this.renderer.params.fields);
+        return fieldList;
+    };
+
 
     var ensureHandler = function (n) {
         return $this.renderer[n] || impl[n];
     };
 
     var impl = {
-        resolveRuleset: function(fieldsetRule){
+        resolveRuleset:function(fieldsetRule){
             if(fieldsetRule===undefined){
                 return undefined;
             }
@@ -67,16 +81,16 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
             }
 
         },
-        getValueOfModel: function (model) {
+        getValueOfModel:function (model) {
             return $this.getValueOf($this.getfieldIdOfModel(model));
         },
-        getfieldIdOfModel: function (model) {
+        getfieldIdOfModel:function (model) {
             return $("#" + $this.renderer.target + "base_form .field[data-model='" + model + "']").attr("id");
         },
-        fieldCount: function () {
+        fieldCount:function () {
             return $("#" + $this.renderer.target + "base_form .form-row").length;
         },
-        getFieldIdAt: function (position) {
+        getFieldIdAt:function (position) {
             var p = position;
             if (p >= 0 && p < $this.fieldCount()) {
                 return $("#" + $this.renderer.target + "base_form .form-row").eq(p).attr("id");
@@ -85,42 +99,42 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 return undefined;
             }
         },
-        addField: function (fielddata) {
+        addField:function (fielddata) {
             var sb = new StringBuilder();
             $this.renderer.renderDataField(sb, fielddata);
             $("#" + $this.renderer.target + "base_form .form-row").last().parent().append(sb.toString());
         },
-        insertField: function (fielddata, position) {
+        insertField:function (fielddata, position) {
             var sb = new StringBuilder();
             $this.renderer.renderDataField(sb, fielddata);
             $("#" + $this.renderer.target + "base_form .form-row").eq(position).before(sb.toString());
         },
-        removeFieldAt: function (position) {
+        removeFieldAt:function (position) {
             var p = position;
             if (p >= 0 && p < $this.fieldCount()) {
                 $("#" + $this.renderer.target + "base_form .form-row").eq(p).remove();
             }
         },
-        removeFieldById: function (fieldid) {
+        removeFieldById:function (fieldid) {
             if (!fieldid.startsWith($this.renderer.target + "_")) {
                 fieldid = $this.renderer.target + "_" + fieldid;
             }
             $("#" + fieldid).remove();
         },
-        getValueAt: function (position) {
+        getValueAt:function (position) {
             var p = position;
             if (p >= 0 && p < $this.fieldCount()) {
                 var id = $("#" + $this.renderer.target + "base_form .form-row").eq(p).attr("id");
                 return rz.widgets.formHelpers.getValueOfField("#" + id);
             }
         },
-        getValueOf: function (fieldid) {
+        getValueOf:function (fieldid) {
             if (!fieldid.startsWith($this.renderer.target + "_")) {
                 fieldid = $this.renderer.target + "_" + fieldid;
             }
             return rz.widgets.formHelpers.getValueOfField("#" + fieldid);
         },
-        setValueOf: function (fieldid, value,behaviors) {
+        setValueOf:function (fieldid, value,behaviors) {
             var bh = behaviors ||{bypassEventHandling:false};
             if (fieldid !== undefined) {
                 if (!fieldid.startsWith($this.renderer.target + "_")) {
@@ -132,10 +146,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 }
             }
         },
-        setValueOfModel: function (model, value) {
+        setValueOfModel:function (model, value) {
             return $this.setValueOf($this.getfieldIdOfModel(model), value);
         },
-        setValueAt: function (position, value) {
+        setValueAt:function (position, value) {
             var p = position;
             if (p >= 0 && p < $this.fieldCount()) {
                 var id = $("#" + $this.renderer.target + "base_form .form-row").eq(p).attr("id");
@@ -146,19 +160,19 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 }
             }
         },
-        getFormData: function (fieldsetRule) {
+        getFormData:function (fieldsetRule) {
             return rz.widgets.formHelpers.getFormDataImpl($this.renderer, fieldsetRule);
         },
-        setFormData: function (formData, fieldsetRule) {
+        setFormData:function (formData, fieldsetRule) {
             rz.widgets.formHelpers.setFormDataImpl(formData, $this.renderer, fieldsetRule);
         },
-        clearFormData: function (fieldsetRule) {
+        clearFormData:function (fieldsetRule) {
             rz.widgets.formHelpers.clearFormDataImpl($this.renderer, fieldsetRule);
         },
-        validateForm: function (validationResultHandler, fieldsetRule, forceSuccess) {
+        validateForm:function (validationResultHandler, fieldsetRule, forceSuccess) {
             rz.widgets.formHelpers.validateFormImpl($this.renderer, $this.renderer.params, validationResultHandler, fieldsetRule, forceSuccess);
         },
-        getFieldParams: function (filterValue, filterBy) {
+        getFieldParams:function (filterValue, filterBy) {
             var fieldid = undefined;
             if (filterBy === undefined) filterBy = "model";
             if (filterBy == "id") {
@@ -177,7 +191,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
             }
             return rz.widgets.formHelpers.getFieldParams(fieldid, $this.renderer.params.fields);
         },
-        getFieldValue: function (field, filterBy) {
+        getFieldValue:function (field, filterBy) {
             if (filterBy == "id") {
                 return $this.getValueOf(field);
             }
@@ -188,7 +202,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 return $this.getValueOfModel(field);
             }
         },
-        setFieldValue: function (field, value, filterBy) {
+        setFieldValue:function (field, value, filterBy) {
             if (filterBy == "id") {
                 return $this.setValueOf(field, value);
             }
@@ -296,7 +310,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 });
             }
         },
-        hideFields : function(filterValue,filterBy,preserveGroupVisibility){
+        hideFields:function(filterValue,filterBy,preserveGroupVisibility){
             var fields = $this.getFieldDefinitions(filterValue,filterBy);
             if(fields.length > 0){
                 fields.forEach(function(field){
@@ -319,6 +333,15 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                     console.warn("Should display group");
                 }
             }
+        },
+        getGroupInfo:function(name){
+            var defs = $this.getAllGroupDefinitions();
+            var groupDefinition = defs.find(function(d){
+                return d.groupName==name;
+            });
+
+            return groupDefinition;
+
         }
     };
 
@@ -443,6 +466,14 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
 
     this.displayFields = function(filterValue,filterBy){
         ensureHandler("displayFields")(filterValue,filterBy);
+    };
+    
+    this.getGroupInfo = function(name){
+        return ensureHandler("getGroupInfo")(name);
+    };
+
+    this.activateGroup = function(name){
+        ensureHandler("activateGroup")(name);
     }
 
 });

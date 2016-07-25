@@ -35,7 +35,12 @@ rz.widgets.RZFormWidgetHelpers = {
         "disableFields",
         "enableFields",
         "hideFields",
-        "displayFields"
+        "displayFields",
+
+        "getGroupInfo",
+        "activateGroup",
+
+        "deactivateGroup"
     ],
     FormWidgetEventHandlers : [
         "data-changed",

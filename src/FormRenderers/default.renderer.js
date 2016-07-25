@@ -89,7 +89,8 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     };
 
     var renderCollapseContainer = function (sb, fieldID, field) {
-        sb.appendFormat('<div class="ui styled fluid accordion">');
+        field.groupID = field.groupID || generateRandomID();
+        sb.appendFormat('<div id="{0}" class="ui styled fluid accordion">', field.groupID);
         sb.appendFormat('    <div class="active title">');
         sb.appendFormat('    <i class="dropdown icon"></i>');
         sb.appendFormat('    {0}',field.groupLabel || "");
@@ -141,21 +142,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
     };
 
-    //interface (levar pra baixo)
-    this.activateGroup = function(name){
-        var params = $this.sender.getGroupInfo(name);
-        var groupType = params.groupType || "tabpanel";
-        if(groupType=="tabpanel"){
-            alert("pera");
-            console.error("oera");
-            $("").tab('change tab', 'tab-name');
-        }
-        if(groupType=="collapse"){
-
-        }
-    };
-
-    this.showFieldGroup = function(groupInfo){
+     this.showFieldGroup = function(groupInfo){
         var groupType = groupInfo.groupType || "tabpanel";
         switch(groupType){
             case "tabpanel":
@@ -165,6 +152,19 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             case "fieldgroup":break;
         }
     };
+
+    //interface (levar pra baixo)
+    this.activateGroup = function(name){
+        var params = $this.sender.getGroupInfo(name);
+        var groupType = params.groupType || "tabpanel";
+        if(groupType=="tabpanel"){
+            $("#" + $this.sender.baseID + " .rz-tabpanel .item").tab('change tab', params.groupID);
+        }
+        if(groupType=="collapse"){
+            $("#" + params.groupID).accordion('open',0);
+        }
+    };
+
 
     this.renderDataField = function (sb, field) {
         var fieldID = (field.id || field.model || "field_" + generateRandomID(8)).replace(/\./g, "_");

@@ -165,6 +165,18 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
     };
 
+    this.deactivateGroup = function(name){
+        var params = $this.sender.getGroupInfo(name);
+        var groupType = params.groupType || "tabpanel";
+        if(groupType=="tabpanel"){
+            //getSibling
+            $("#" + $this.sender.baseID + " .rz-tabpanel .item").tab('change tab', params.groupID);
+        }
+        if(groupType=="collapse"){
+            $("#" + params.groupID).accordion('close',0);
+        }
+    };
+
 
     this.renderDataField = function (sb, field) {
         var fieldID = (field.id || field.model || "field_" + generateRandomID(8)).replace(/\./g, "_");

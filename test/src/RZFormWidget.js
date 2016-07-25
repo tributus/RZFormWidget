@@ -41,7 +41,6 @@ rz.widgets.RZFormWidgetHelpers = {
         "enableFields",
         "hideFields",
         "displayFields",
-
         "getGroupInfo",
         "activateGroup",
 
@@ -978,6 +977,18 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         }
     };
 
+    this.deactivateGroup = function(name){
+        var params = $this.sender.getGroupInfo(name);
+        var groupType = params.groupType || "tabpanel";
+        if(groupType=="tabpanel"){
+            //getSibling
+            $("#" + $this.sender.baseID + " .rz-tabpanel .item").tab('change tab', params.groupID);
+        }
+        if(groupType=="collapse"){
+            $("#" + params.groupID).accordion('close',0);
+        }
+    };
+
 
     this.renderDataField = function (sb, field) {
         var fieldID = (field.id || field.model || "field_" + generateRandomID(8)).replace(/\./g, "_");
@@ -1790,6 +1801,12 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 }
             }
         },
+        activateGroup:function(name){
+            console.warn("not implemented for this renderer");
+        },
+        deactivateGroup:function(name){
+            console.warn("not implemented for this renderer");
+        },
         getGroupInfo:function(name){
             var defs = $this.getAllGroupDefinitions();
             var groupDefinition = defs.find(function(d){
@@ -1930,6 +1947,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
 
     this.activateGroup = function(name){
         ensureHandler("activateGroup")(name);
+    };
+    
+    this.deactivateGroup = function(name){
+        ensureHandler("deactivateGroup")(name);
     }
 
 });

@@ -334,6 +334,12 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 }
             }
         },
+        activateGroup:function(name){
+            console.warn("not implemented for this renderer");
+        },
+        deactivateGroup:function(name){
+            console.warn("not implemented for this renderer");
+        },
         getGroupInfo:function(name){
             var defs = $this.getAllGroupDefinitions();
             var groupDefinition = defs.find(function(d){
@@ -474,6 +480,10 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
 
     this.activateGroup = function(name){
         ensureHandler("activateGroup")(name);
+    };
+    
+    this.deactivateGroup = function(name){
+        ensureHandler("deactivateGroup")(name);
     }
 
 });

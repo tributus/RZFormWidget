@@ -318,7 +318,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                     rz.widgets.formHelpers.executeFieldAction("hide",field.id,$this,undefined,field);
                 });
                 if(filterBy=="group" && !preserveGroupVisibility){
-                    console.warn("Should hide group");
+                    $this.renderer.hideFieldGroup($this.getGroupDefinition(filterValue));
                 }
             }
         },

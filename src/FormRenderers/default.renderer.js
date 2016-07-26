@@ -135,6 +135,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         switch(groupType){
             case "tabpanel":
                 //if active then active another
+                $this.sender.deactivateGroup(groupInfo.groupName);
                 $(".visual-element-for-group-" + groupInfo.groupName).css("display","none");
                 break;
             case "collapse":break;
@@ -169,8 +170,17 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         var params = $this.sender.getGroupInfo(name);
         var groupType = params.groupType || "tabpanel";
         if(groupType=="tabpanel"){
-            //getSibling
-            $("#" + $this.sender.baseID + " .rz-tabpanel .item").tab('change tab', params.groupID);
+            var el = $("#" + $this.sender.baseID + " .rz-tabpanel .item.visual-element-for-group-" + name);
+
+            if(el.hasClass("active")){
+                //getSibling
+                var siblings= el.siblings();
+                if(siblings.length > 0)
+                {
+                    var siblingID = $(siblings[0]).data("tab");
+                    el.tab('change tab', siblingID);
+                }
+            }
         }
         if(groupType=="collapse"){
             $("#" + params.groupID).accordion('close',0);

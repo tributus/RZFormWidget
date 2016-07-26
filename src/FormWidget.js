@@ -160,8 +160,8 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                 }
             }
         },
-        getFormData:function (fieldsetRule) {
-            return rz.widgets.formHelpers.getFormDataImpl($this.renderer, fieldsetRule);
+        getFormData:function (fieldsetRule,getFromHiddenFields) {
+            return rz.widgets.formHelpers.getFormDataImpl($this.renderer, fieldsetRule,getFromHiddenFields);
         },
         setFormData:function (formData, fieldsetRule) {
             rz.widgets.formHelpers.setFormDataImpl(formData, $this.renderer, fieldsetRule);
@@ -169,8 +169,8 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
         clearFormData:function (fieldsetRule) {
             rz.widgets.formHelpers.clearFormDataImpl($this.renderer, fieldsetRule);
         },
-        validateForm:function (validationResultHandler, fieldsetRule, forceSuccess) {
-            rz.widgets.formHelpers.validateFormImpl($this.renderer, $this.renderer.params, validationResultHandler, fieldsetRule, forceSuccess);
+        validateForm:function (validationResultHandler, fieldsetRule, forceSuccess,validateHiddenFields) {
+            rz.widgets.formHelpers.validateFormImpl($this.renderer, $this.renderer.params, validationResultHandler, fieldsetRule, forceSuccess,validateHiddenFields);
         },
         getFieldParams:function (filterValue, filterBy) {
             var fieldid = undefined;
@@ -314,7 +314,9 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
             var fields = $this.getFieldDefinitions(filterValue,filterBy);
             if(fields.length > 0){
                 fields.forEach(function(field){
-                    $("#" + field.id).css("display","none");
+                    var el = $("#" + field.id);
+                    el.css("display","none");
+                    el.data("ishidden","true");
                     rz.widgets.formHelpers.executeFieldAction("hide",field.id,$this,undefined,field);
                 });
                 if(filterBy=="group" && !preserveGroupVisibility){
@@ -326,7 +328,9 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
             var fields = $this.getFieldDefinitions(filterValue,filterBy);
             if(fields.length > 0){
                 fields.forEach(function(field){
-                    $("#" + field.id).css("display","");
+                    var el = $("#" + field.id);
+                    el.css("display","");
+                    el.data("ishidden","false");
                     rz.widgets.formHelpers.executeFieldAction("display",field.id,$this,undefined,field);
                 });
                 if(filterBy=="group"){
@@ -408,8 +412,8 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
         return ensureHandler("setValueOfModel")(model, value);
     };
 
-    this.getFormData = function (fieldsetRule) {
-        return ensureHandler("getFormData")(impl.resolveRuleset(fieldsetRule));
+    this.getFormData = function (fieldsetRule,getFromHiddenFields) {
+        return ensureHandler("getFormData")(impl.resolveRuleset(fieldsetRule),getFromHiddenFields);
     };
 
     this.setFormData = function (formData, fieldsetRule) {
@@ -425,9 +429,9 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
         ensureHandler("clearFormData")($this.lastFieldsetRules);
     };
 
-    this.validateForm = function (validationResultHandler, fieldsetRule) {
+    this.validateForm = function (validationResultHandler, fieldsetRule,validateHiddenFields) {
         $this.lastFieldsetRules = impl.resolveRuleset(fieldsetRule);
-        ensureHandler("validateForm")(validationResultHandler, $this.lastFieldsetRules);
+        ensureHandler("validateForm")(validationResultHandler, $this.lastFieldsetRules,false,validateHiddenFields);
     };
 
     this.getFieldParams = function (filterValue, filterBy) {

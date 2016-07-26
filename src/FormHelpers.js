@@ -111,7 +111,7 @@ rz.widgets.formHelpers = {
             });
         }
     },
-    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule,forceSuccess) {
+    validateFormImpl: function ($this, params, validationResultHandler,fieldsetRule,forceSuccess,validateHiddenFields) {
         validationResultHandler = rz.helpers.ensureFunction(validationResultHandler);
         var formData = $this.sender.getFormData();
         var $that = this;
@@ -120,13 +120,15 @@ rz.widgets.formHelpers = {
             $this.sender.validationReport = [];
             params.validation.rules.forEach(function (rule) {
                 var fieldID = $("#" + $this.target +  "base_form .field[data-model='"+rule.model+"']").attr("id");
-                if((fieldsetRule!==undefined && $that.fieldMatchFieldSetRule(fieldID,fieldsetRule)) || fieldsetRule===undefined){
-                    if(!forceSuccess){
-                        rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
-                            if (!result) {
-                                $this.sender.validationReport.push({failedRule: rule});
-                            }
-                        });
+                if( $("#" + fieldID).data("ishidden")!="true"||validateHiddenFields){
+                    if((fieldsetRule!==undefined && $that.fieldMatchFieldSetRule(fieldID,fieldsetRule)) || fieldsetRule===undefined){
+                        if(!forceSuccess){
+                            rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
+                                if (!result) {
+                                    $this.sender.validationReport.push({failedRule: rule});
+                                }
+                            });
+                        }
                     }
                 }
             });
@@ -159,23 +161,25 @@ rz.widgets.formHelpers = {
             $(reportTarget).empty();
         }
     },
-    getFormDataImpl: function ($this,fieldsetRule) {
+    getFormDataImpl: function ($this,fieldsetRule,getFromHiddenFields) {
         var root = {};
         var rcount = $this.sender.fieldCount();
         for (var i = 0; i < rcount; i++) {
             var id = $this.sender.getFieldIdAt(i);
-            var model = $("#" + id).data("model");
-            if(model!==undefined && model !="***"){
-                if(fieldsetRule!==undefined){
-                    if(this.fieldMatchFieldSetRule(id,fieldsetRule)){
+            var el = $("#" + id);
+            if(el.data("ishidden") !="true"||getFromHiddenFields){
+                var model = el.data("model");
+                if(model!==undefined && model !="***"){
+                    if(fieldsetRule!==undefined){
+                        if(this.fieldMatchFieldSetRule(id,fieldsetRule)){
+                            rz.helpers.jsonUtils.setDataAtPath(root, $this.sender.getValueOf(id), model);
+                        }
+                    }
+                    else{
                         rz.helpers.jsonUtils.setDataAtPath(root, $this.sender.getValueOf(id), model);
                     }
                 }
-                else{
-                    rz.helpers.jsonUtils.setDataAtPath(root, $this.sender.getValueOf(id), model);
-                }
             }
-
         }
         return root;
     },

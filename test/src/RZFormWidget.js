@@ -887,6 +887,7 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
         var actidx = activeTabIndex();
         sb.appendFormat('<div class="ui top attached tabular menu rz-tabpanel">');
         $this.params.fields.forEach(function (it, id) {
+            it.groupName = it.groupName || generateRandomID();
             var targetID = generateRandomID(12);
             sb.appendFormat('<a class="item {2}  visual-element-for-group-{3}" data-tab="{1}">{0}</a>'
                 , it.groupLabel
@@ -901,7 +902,8 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
 
     var renderCollapseContainer = function (sb, fieldID, field) {
         field.groupID = field.groupID || generateRandomID();
-        sb.appendFormat('<div id="{0}" class="ui styled fluid accordion">', field.groupID);
+        field.groupName = field.groupName || generateRandomID();
+        sb.appendFormat('<div id="{0}" data-groupname="{1}" class="ui styled fluid accordion visual-element-for-group-{1}">', field.groupID,field.groupName);
         sb.appendFormat('    <div class="active title">');
         sb.appendFormat('    <i class="dropdown icon"></i>');
         sb.appendFormat('    {0}',field.groupLabel || "");
@@ -932,9 +934,10 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     var renderFieldGroupContainer = function(sb, fieldID, field){
         var c = ["zero", "one","two","three","four","five","six","seven", "eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen"];
         var fieldCount =  field.fields.count;
+        field.groupName = field.groupName || generateRandomID();
         if(fieldCount===undefined || fieldCount > 16) fieldCount=2;
         var fieldCountName = field.columCount ||c[fieldCount];
-        sb.appendFormat('<div class="{0} fields">',fieldCountName);
+        sb.appendFormat('<div class="{0} fields visual-element-for-group-{1}" data-groupname="{1}">',fieldCountName,field.groupName);
         field.fields.forEach(function (it) {
             $this.renderDataField(sb, it);
         });
@@ -943,26 +946,14 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
     
     this.hideFieldGroup = function(groupInfo){
         var groupType = groupInfo.groupType || "tabpanel";
-        switch(groupType){
-            case "tabpanel":
-                //if active then active another
-                $this.sender.deactivateGroup(groupInfo.groupName);
-                $(".visual-element-for-group-" + groupInfo.groupName).css("display","none");
-                break;
-            case "collapse":break;
-            case "fieldgroup":break;
+        if(groupType=="tabpanel"){
+            $this.sender.deactivateGroup(groupInfo.groupName);
         }
+        $(".visual-element-for-group-" + groupInfo.groupName).css("display","none");
     };
 
      this.showFieldGroup = function(groupInfo){
-        var groupType = groupInfo.groupType || "tabpanel";
-        switch(groupType){
-            case "tabpanel":
-                $(".visual-element-for-group-" + groupInfo.groupName).css("display","");
-                break;
-            case "collapse":break;
-            case "fieldgroup":break;
-        }
+         $(".visual-element-for-group-" + groupInfo.groupName).css("display","");
     };
 
     //interface (levar pra baixo)

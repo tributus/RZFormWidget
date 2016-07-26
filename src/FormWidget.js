@@ -330,7 +330,7 @@ rz.widgets.FormWidget = ruteZangada.widget("Form", rz.widgets.RZFormWidgetHelper
                     rz.widgets.formHelpers.executeFieldAction("display",field.id,$this,undefined,field);
                 });
                 if(filterBy=="group"){
-                    console.warn("Should display group");
+                    $this.renderer.showFieldGroup($this.getGroupDefinition(filterValue));
                 }
             }
         },

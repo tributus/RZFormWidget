@@ -38,7 +38,6 @@ rz.widgets.RZFormWidgetHelpers = {
         "displayFields",
         "getGroupInfo",
         "activateGroup",
-
         "deactivateGroup"
     ],
     FormWidgetEventHandlers : [

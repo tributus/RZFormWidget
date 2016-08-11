@@ -13,5 +13,11 @@
   "license": "MIT",
   "devDependencies": {
     "grunt": "^0.4.5"
+  },
+  "dependencies": {
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jasmine": "^1.0.3",
+    "grunt-contrib-uglify": "^2.0.0"
   }
 }

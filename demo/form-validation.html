@@ -103,6 +103,7 @@
                 },
                 {model: "Email", label: "Email", type: "text", id: "email"},
                 {model: "Idade", label: "Idade", type: "text", id: "idade"},
+                {model: "doadorOrgaos", type:"checkbox",checkboxLabel:"Doador de órgãos e tecidos",label:"órgãos e tecidos",initialValue:true},
                 {
                     model: "CNPJ",
                     label: "CNPJ",
@@ -173,6 +174,14 @@
                     valueType: "text",
                     operator: "==",
                     message: "As senhas não coincidem"
+                },
+                {
+                    model: "doadorOrgaos",
+                    type: "custom",
+                    message: "Você deve ser doador de órgãos para prosseguir com este cadastro",
+                    validationFunction: function (sender, data, callback, params) {
+                        callback(data);
+                    }
                 }
             ]
         }

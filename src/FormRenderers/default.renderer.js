@@ -214,14 +214,17 @@ rz.widgets.FormRenderers["default"] = function (params, sender) {
             var inputID = $this.target + "_" + fieldID + "_" + field.type;
             if(h) sb.appendFormat('<div class="sixteen wide field">');
 
-            if(field.label !==undefined || field.preserveLabelOffset){
-                sb.appendFormat('<label for="{1}" class="{2} {3}">{0}</label>',
-                    field.label || "&nbsp;",
-                    inputID,
-                    "control-label",
-                    field.labelCssClass || ""
-                );
+            if(!field.hideDefaultLabel){
+                if(field.label !==undefined || field.preserveLabelOffset){
+                    sb.appendFormat('<label for="{1}" class="{2} {3}">{0}</label>',
+                        field.label || "&nbsp;",
+                        inputID,
+                        "control-label",
+                        field.labelCssClass || ""
+                    );
+                }
             }
+
 
             rz.widgets.formHelpers.renderDataFieldByType(sb, field, inputID, $this);
             if(h) {

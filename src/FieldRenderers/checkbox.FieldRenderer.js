@@ -18,7 +18,7 @@ rz.widgets.formHelpers.createFieldRenderer("checkbox", {
         };
 
         sb.appendFormat('<div class="{0} field-container">',field.containerClass || "ui fitted segment");
-        sb.appendFormat('<div id="{0}_el" class="ui {0} checkbox">', containerID, field.checkboxStyle|| "");
+        sb.appendFormat('<div id="{0}_el" class="ui {1} checkbox">', containerID, field.checkboxStyle|| "");
         sb.appendFormat('  <input type="checkbox" name="{0}" {1}>',field.id,field.initialValue ? "checked":"");
         sb.appendFormat('  <label>{0}</label>',field.checkboxLabel || field.label || "");
         sb.appendFormat('</div>');

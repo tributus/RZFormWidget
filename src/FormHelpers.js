@@ -123,7 +123,7 @@ rz.widgets.formHelpers = {
                 if( $("#" + fieldID).data("ishidden")!="true"||validateHiddenFields){
                     if((fieldsetRule!==undefined && $that.fieldMatchFieldSetRule(fieldID,fieldsetRule)) || fieldsetRule===undefined){
                         if(!forceSuccess){
-                            rz.widgets.formHelpers.validateField(rule.type, $this.sender, formData[rule.model], rule, function (result, params) {
+                            rz.widgets.formHelpers.validateField(rule.type, $this.sender, rz.helpers.jsonUtils.getDataAtPath(formData,rule.model), rule, function (result, params) {
                                 if (!result) {
                                     $this.sender.validationReport.push({failedRule: rule});
                                 }
